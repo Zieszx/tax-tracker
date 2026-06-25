@@ -73,7 +73,16 @@ test('shows live result figures in the filing steps', async () => {
 
   await waitFor(() => expect(screen.getByRole('heading', { name: /Borang BE e-Filing Guide/i })).toBeInTheDocument())
 
-  // The live gross figure should appear (not just a dash)
-  const grossCells = screen.getAllByText(/RM/)
-  expect(grossCells.length).toBeGreaterThan(0)
+  // The live gross figure should show the seeded totalGross (~72.5k, not a dash '—')
+  // defaultProfile seeded via migrateV1 produces totalGross between RM 68,000 and RM 78,000
+  // We expect a formatted RM figure with digits — e.g. "RM 72,540.00"
+  await waitFor(() => {
+    const rmCells = screen.getAllByText(/RM\s[\d,]+\.\d{2}/)
+    expect(rmCells.length).toBeGreaterThan(0)
+    // At least one RM figure should represent the totalGross (>= 68000)
+    const amounts = rmCells.map(el =>
+      parseFloat(el.textContent.replace(/[^0-9.]/g, ''))
+    )
+    expect(amounts.some(a => a >= 68000 && a <= 78000)).toBe(true)
+  })
 })
