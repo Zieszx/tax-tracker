@@ -1,0 +1,4 @@
+.app { min-height: 100vh; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+h2.page-title { margin: 0 0 4px; font-size: 26px; }
+.subtitle { color: var(--muted); margin: 0 0 20px; }
