@@ -71,6 +71,23 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
 .btn-dark .btn-ink, :root[data-theme="dark"] .btn-ink{background:#000;}
 .btn-ghost{background:transparent;color:var(--ink);}
 
+/* ── YearSwitcher (Task 3.2) ───────────────────────────────────────────── */
+.year-switcher { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.year-select { background: var(--paper); border: 2px solid var(--border); border-radius: 10px; padding: 7px 10px; font-size: 14px; font-weight: 700; color: var(--ink); cursor: pointer; outline: none; min-width: 80px; }
+.year-select:focus { border-color: var(--gold); }
+.year-add-btn { padding: 7px 12px; font-size: 13px; }
+.year-add-form { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.year-add-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); white-space: nowrap; }
+.year-add-input { background: var(--paper); border: 2px solid var(--border); border-radius: 10px; padding: 7px 10px; font-size: 14px; font-weight: 700; color: var(--ink); outline: none; width: 80px; }
+.year-add-input:focus { border-color: var(--gold); }
+.year-add-confirm { padding: 7px 11px; font-size: 13px; }
+.year-add-cancel { padding: 7px 11px; font-size: 13px; }
+@media (max-width: 480px) {
+  .year-switcher { gap: 6px; }
+  .year-add-form { gap: 4px; }
+  .year-add-label { display: none; }
+}
+
 /* ── Income page (Task 3.1) ─────────────────────────────────────────────── */
 .income-section { margin-bottom: 28px; }
 .income-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }

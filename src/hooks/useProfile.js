@@ -198,15 +198,52 @@ export function ProfileProvider({ children }) {
     })
   }
 
+  // ── addYear ───────────────────────────────────────────────────────────────
+  // mode: 'blank' | 'clone'
+  async function addYear(newYear, mode = 'blank') {
+    await save((appData) => {
+      const sourceYear =
+        mode === 'clone'
+          ? (appData.years?.[appData.activeYear] ?? blankYearProfile(newYear))
+          : null
+      const newProfile =
+        mode === 'clone' && sourceYear
+          ? { ...sourceYear, taxYear: newYear }
+          : blankYearProfile(newYear)
+      return {
+        ...appData,
+        activeYear: newYear,
+        years: {
+          ...appData.years,
+          [newYear]: newProfile,
+        },
+      }
+    })
+  }
+
+  // ── setActiveYear ─────────────────────────────────────────────────────────
+  async function setActiveYear(newYear) {
+    await save((appData) => ({
+      ...appData,
+      activeYear: newYear,
+    }))
+  }
+
   // ── context value ─────────────────────────────────────────────────────────
   // Provide null when vault is locked (consumers check before use)
+  const allYears = isUnlocked ? Object.keys(data.years ?? {}).map(Number) : []
+
   const value = isUnlocked
     ? {
         profile,
         result,
         year: yearProfile,
+        activeYear,
+        allYears,
         setYear,
         setProfile,
+        setActiveYear,
+        addYear,
         resetToDefault,
         clearToBlank,
         exportJson,

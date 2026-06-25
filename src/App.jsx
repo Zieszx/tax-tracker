@@ -6,6 +6,7 @@ import { ThemeProvider } from './components/ThemeProvider.jsx'
 import Nav from './components/Nav.jsx'
 import ThemeToggle from './components/ThemeToggle.jsx'
 import LockButton from './components/LockButton.jsx'
+import YearSwitcher from './components/YearSwitcher.jsx'
 import Footer from './components/Footer.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Income from './pages/Income.jsx'
@@ -43,6 +44,7 @@ function AppShell() {
         <Nav />
         <main className="main">
           <div className="topbar">
+            <YearSwitcher />
             <ThemeToggle />
             <LockButton />
           </div>
