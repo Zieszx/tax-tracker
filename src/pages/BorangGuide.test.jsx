@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { VaultProvider, useVault } from '../security/useVault.jsx'
 import { ProfileProvider } from '../hooks/useProfile.js'
 import BorangGuide from './BorangGuide.jsx'
@@ -30,18 +31,49 @@ function VaultSeeder({ children }) {
 
 function wrap(ui) {
   return (
-    <VaultProvider>
-      <VaultSeeder>
-        <ProfileProvider>{ui}</ProfileProvider>
-      </VaultSeeder>
-    </VaultProvider>
+    <MemoryRouter>
+      <VaultProvider>
+        <VaultSeeder>
+          <ProfileProvider>{ui}</ProfileProvider>
+        </VaultSeeder>
+      </VaultProvider>
+    </MemoryRouter>
   )
 }
 
-test('shows e-filing steps, deadline, and data controls', async () => {
+test('shows expanded sections: documents, Bahagian B, deadline, JomPAY, late penalties, Umiii', async () => {
   render(wrap(<BorangGuide />))
-  await waitFor(() => expect(screen.getByText(/Borang BE/i)).toBeInTheDocument())
-  expect(screen.getByText(/30 April 2027/i)).toBeInTheDocument()
-  expect(screen.getByText(/Export/i)).toBeInTheDocument()
-  expect(screen.getByText(/Reset to my 2026 data/i)).toBeInTheDocument()
+
+  await waitFor(() => expect(screen.getByRole('heading', { name: /Borang BE e-Filing Guide/i })).toBeInTheDocument())
+
+  // Deadline
+  expect(screen.getAllByText(/30 April 2027/i).length).toBeGreaterThan(0)
+
+  // Documents to prepare section
+  expect(screen.getByText(/Documents to prepare/i)).toBeInTheDocument()
+
+  // Bahagian B step
+  expect(screen.getAllByText(/Bahagian B/i).length).toBeGreaterThan(0)
+
+  // Payment section — JomPAY
+  expect(screen.getAllByText(/JomPAY/i).length).toBeGreaterThan(0)
+
+  // Late penalties
+  expect(screen.getAllByText(/late/i).length).toBeGreaterThan(0)
+
+  // Umiii special note
+  expect(screen.getAllByText(/Umiii/i).length).toBeGreaterThan(0)
+
+  // Settings link for data management
+  expect(screen.getAllByText(/Settings/i).length).toBeGreaterThan(0)
+})
+
+test('shows live result figures in the filing steps', async () => {
+  render(wrap(<BorangGuide />))
+
+  await waitFor(() => expect(screen.getByRole('heading', { name: /Borang BE e-Filing Guide/i })).toBeInTheDocument())
+
+  // The live gross figure should appear (not just a dash)
+  const grossCells = screen.getAllByText(/RM/)
+  expect(grossCells.length).toBeGreaterThan(0)
 })

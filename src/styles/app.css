@@ -106,6 +106,26 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .be-checklist { padding-left: 18px; line-height: 1.9; }
 .data-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 
+/* ── Expanded BorangGuide (Task 4.4) ─────────────────────────────────────── */
+.be-subheading { font-size: 14px; font-weight: 800; color: var(--ink); margin: 14px 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+.be-body { font-size: 14px; color: var(--ink); line-height: 1.6; margin: 4px 0 8px; }
+.be-step-title { font-size: 15px; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+.be-field-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; background: var(--paper); border: 1.5px solid var(--border); border-radius: 10px; margin: 6px 0; }
+.be-field-highlight { border-color: var(--gold); box-shadow: 2px 2px 0 var(--gold); }
+.be-field-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.be-field-value { font-size: 16px; font-weight: 800; color: var(--gold); white-space: nowrap; }
+.be-list { padding-left: 18px; line-height: 1.8; font-size: 13px; color: var(--ink); }
+.be-note { font-size: 12px; color: var(--muted); background: color-mix(in srgb, var(--gold) 8%, transparent); border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent); border-radius: 8px; padding: 7px 10px; margin: 6px 0; }
+.be-note-card { background: var(--paper); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 14px; font-weight: 700; color: var(--ink); }
+.be-note-card .be-body { font-weight: 400; }
+.be-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.be-table th { text-align: left; padding: 8px 12px; background: var(--paper); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 2px solid var(--border); font-weight: 700; }
+.be-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.be-table tr:last-child td { border-bottom: none; }
+.be-settings-link { text-align: center; }
+.be-link { color: var(--gold); font-weight: 700; text-decoration: none; }
+.be-link:hover { text-decoration: underline; }
+
 .btn{font:inherit;font-weight:800;cursor:pointer;border:2.5px solid var(--border);border-radius:12px;padding:9px 15px;box-shadow:3px 3px 0 var(--border);transition:transform .05s, box-shadow .05s;}
 .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--border);}
 .btn-gold{background:var(--gold);color:#1a1408;}
