@@ -54,6 +54,7 @@ export default function PrintSummary() {
   // If vault is locked / profile unavailable, render nothing (still in DOM for
   // the .print-only wrapper to be detectable by the test).
   const result = profileCtx?.result
+  const activeYear = profileCtx?.activeYear ?? '—'
 
   const balanceLabel = result?.isRefund ? 'Refund due to you' : 'Balance of tax payable'
   const balanceValue = result ? Math.abs(result.balance) : 0
@@ -63,7 +64,7 @@ export default function PrintSummary() {
       <div className="print-summary">
         <h1 className="print-title">Tax Summary — Malaysia Borang BE</h1>
         <p className="print-subtitle">
-          Assessment Year 2026 · Generated {new Date().toLocaleDateString('en-MY')}
+          Assessment Year {activeYear} · Generated {new Date().toLocaleDateString('en-MY')}
         </p>
         <p className="print-subtitle" style={{ fontStyle: 'italic' }}>
           This document contains no personal identifiers. Keep it secure.

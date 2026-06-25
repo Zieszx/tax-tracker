@@ -50,11 +50,14 @@ function wrap(ui) {
 test('renders gross tax figure', async () => {
   render(wrap(<PrintSummary />))
   // The seeded data (migrateV1 defaultProfile) produces a non-zero grossTax.
-  // We don't assert the exact RM value since it depends on engine computation,
-  // but we assert that a label referencing "Tax charged" is present.
-  await waitFor(() =>
+  // Assert that the "Tax charged" label is present AND that the corresponding
+  // amount cell contains an RM value (not the fallback '—').
+  await waitFor(() => {
     expect(screen.getByText(/Tax charged/i)).toBeInTheDocument()
-  )
+    // getAllByText finds the RM amount cell(s); at least one must match /RM \d/
+    const amountCells = screen.getAllByText(/^RM [\d,]+\.\d{2}$/)
+    expect(amountCells.length).toBeGreaterThan(0)
+  })
 })
 
 test('renders BE field labels', async () => {
