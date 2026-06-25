@@ -12,6 +12,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { vi } from 'vitest'
 import Settings from './Settings.jsx'
+import { ThemeProvider } from '../components/ThemeProvider.jsx'
 
 // ── mock useVault ──────────────────────────────────────────────────────────
 vi.mock('../security/useVault.jsx', () => ({
@@ -68,7 +69,7 @@ afterEach(() => {
 // ── 1. Presence of key sections ────────────────────────────────────────────
 
 test('renders Change passcode, Auto-lock, Reset app, Export sections', () => {
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   // Headings — use getAllByText since the button and heading share the text
   expect(screen.getAllByText(/Change passcode/i).length).toBeGreaterThan(0)
@@ -83,7 +84,7 @@ test('changing auto-lock minutes calls vault.save with updated value', async () 
   const save = vi.fn().mockResolvedValue(undefined)
   useVault.mockReturnValue(makeVault({ save }))
 
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   // The input has aria-label="Auto-lock minutes" — match exactly
   const input = screen.getByLabelText('Auto-lock minutes')
@@ -116,7 +117,7 @@ test('change passcode success: calls changePasscode and shows success message', 
   const changePasscode = vi.fn().mockResolvedValue(true)
   useVault.mockReturnValue(makeVault({ changePasscode }))
 
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   fireEvent.change(screen.getByLabelText(/current passcode/i), { target: { value: 'oldpass1' } })
   fireEvent.change(screen.getByLabelText(/^new passcode$/i), { target: { value: 'newpass1' } })
@@ -141,7 +142,7 @@ test('change passcode failure: shows error when changePasscode returns false', a
   const changePasscode = vi.fn().mockResolvedValue(false)
   useVault.mockReturnValue(makeVault({ changePasscode }))
 
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   fireEvent.change(screen.getByLabelText(/current passcode/i), { target: { value: 'wrongold' } })
   fireEvent.change(screen.getByLabelText(/^new passcode$/i), { target: { value: 'newpass1' } })
@@ -162,7 +163,7 @@ test('change passcode: mismatched new passcodes shows validation error', async (
   const changePasscode = vi.fn()
   useVault.mockReturnValue(makeVault({ changePasscode }))
 
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   fireEvent.change(screen.getByLabelText(/current passcode/i), { target: { value: 'oldpass1' } })
   fireEvent.change(screen.getByLabelText(/^new passcode$/i), { target: { value: 'newpass1' } })
@@ -182,7 +183,7 @@ test('reset app: shows confirmation input and calls resetApp on correct input', 
   const resetApp = vi.fn()
   useVault.mockReturnValue(makeVault({ resetApp }))
 
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   // Click "Reset app" button to reveal confirmation
   const resetBtn = screen.getByRole('button', { name: /reset app/i })
@@ -204,7 +205,7 @@ test('reset app: does not call resetApp when typed text is wrong', async () => {
   const resetApp = vi.fn()
   useVault.mockReturnValue(makeVault({ resetApp }))
 
-  render(<Settings />)
+  render(<Settings />, { wrapper: ThemeProvider })
 
   const resetBtn = screen.getByRole('button', { name: /reset app/i })
   fireEvent.click(resetBtn)

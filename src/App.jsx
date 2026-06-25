@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { useVault, VaultProvider } from './security/useVault.jsx'
 import { useAutoLock } from './security/useAutoLock.js'
 import { ProfileProvider } from './hooks/useProfile.js'
+import { ThemeProvider } from './components/ThemeProvider.jsx'
 import Nav from './components/Nav.jsx'
 import ThemeToggle from './components/ThemeToggle.jsx'
 import LockButton from './components/LockButton.jsx'
@@ -66,8 +67,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <VaultProvider>
-      <AppShell />
-    </VaultProvider>
+    <ThemeProvider>
+      <VaultProvider>
+        <AppShell />
+      </VaultProvider>
+    </ThemeProvider>
   )
 }

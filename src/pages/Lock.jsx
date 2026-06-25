@@ -49,8 +49,8 @@ export default function Lock() {
   }
 
   return (
-    <div className="lock-backdrop">
-      <div className="lock-card" role="main">
+    <div className="lock-backdrop" role="main">
+      <div className="lock-card">
         <div className="lock-brand">
           <span className="lock-icon">🔐</span>
           <h1 className="lock-title">Tax Tracker</h1>

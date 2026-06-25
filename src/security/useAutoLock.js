@@ -19,6 +19,13 @@ import { useEffect, useRef } from 'react'
 export function useAutoLock({ status, autoLockMinutes, lock }) {
   const timerRef = useRef(null)
 
+  // Keep the latest `lock` in a ref so the effect below does not depend on its
+  // identity. VaultProvider recreates `lock` on every render; without this the
+  // effect would tear down and re-arm the inactivity timer on unrelated
+  // re-renders, weakening auto-lock.
+  const lockRef = useRef(lock)
+  useEffect(() => { lockRef.current = lock }, [lock])
+
   useEffect(() => {
     if (status !== 'unlocked') return
 
@@ -26,7 +33,7 @@ export function useAutoLock({ status, autoLockMinutes, lock }) {
 
     function resetTimer() {
       if (timerRef.current) clearTimeout(timerRef.current)
-      timerRef.current = setTimeout(lock, delayMs)
+      timerRef.current = setTimeout(() => lockRef.current(), delayMs)
     }
 
     function handleVisibility() {
@@ -51,5 +58,5 @@ export function useAutoLock({ status, autoLockMinutes, lock }) {
       events.forEach(e => window.removeEventListener(e, resetTimer))
       document.removeEventListener('visibilitychange', handleVisibility)
     }
-  }, [status, autoLockMinutes, lock])
+  }, [status, autoLockMinutes])
 }

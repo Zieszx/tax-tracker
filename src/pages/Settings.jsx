@@ -13,6 +13,7 @@
 import { useState, useRef } from 'react'
 import { useVault } from '../security/useVault.jsx'
 import { useProfile } from '../hooks/useProfile.js'
+import { useTheme } from '../components/ThemeProvider.jsx'
 import Button from '../components/Button.jsx'
 
 // ── theme helpers ──────────────────────────────────────────────────────────
@@ -28,6 +29,7 @@ const THEME_OPTIONS = [
 export default function Settings() {
   const vault   = useVault()
   const profile = useProfile()
+  const { theme, setTheme } = useTheme()
 
   const { settings, save, lock, changePasscode, resetApp, exportPlain } = vault
 
@@ -37,8 +39,8 @@ export default function Settings() {
   const [autoLock, setAutoLock]           = useState(String(settings?.autoLockMinutes ?? 5))
   const [autoLockSaved, setAutoLockSaved] = useState(false)
 
-  // Theme
-  const [theme, setTheme]           = useState(settings?.theme ?? 'system')
+  // Theme — `theme`/`setTheme` come from the shared ThemeProvider so the
+  // selection applies live and stays in sync with the header toggle.
   const [themeSaved, setThemeSaved] = useState(false)
 
   // Change passcode
@@ -75,13 +77,13 @@ export default function Settings() {
   // ── Save theme ────────────────────────────────────────────────────────────
 
   async function handleSaveTheme() {
+    // The theme already applied live via the shared ThemeProvider (and is
+    // persisted to localStorage there). Also record it in the vault settings
+    // so an exported backup carries the preference.
     await save((d) => ({
       ...d,
       settings: { ...d.settings, theme },
     }))
-    // Keep localStorage['theme'] in sync so ThemeToggle applies the change
-    // immediately without requiring a page reload.
-    try { localStorage.setItem('theme', theme) } catch (_) { /* ignore */ }
     setThemeSaved(true)
     setTimeout(() => setThemeSaved(false), 2000)
   }

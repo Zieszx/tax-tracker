@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { beforeEach, afterEach, test, expect, vi } from 'vitest'
 import ThemeToggle from './ThemeToggle.jsx'
+import { ThemeProvider } from './ThemeProvider.jsx'
 
 // Helper to mock matchMedia
 function mockMatchMedia(prefersDark) {
@@ -31,20 +32,20 @@ afterEach(() => {
 test('system + dark matchMedia → data-theme="dark"', () => {
   mockMatchMedia(true) // device prefers dark
   // localStorage empty → default is 'system'
-  render(<ThemeToggle />)
+  render(<ThemeToggle />, { wrapper: ThemeProvider })
   expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
 })
 
 test('system + light matchMedia → data-theme="light"', () => {
   mockMatchMedia(false) // device prefers light
-  render(<ThemeToggle />)
+  render(<ThemeToggle />, { wrapper: ThemeProvider })
   expect(document.documentElement.getAttribute('data-theme')).toBe('light')
 })
 
 test('cycling system → light → dark → system changes attribute correctly', () => {
   mockMatchMedia(true) // device is dark
 
-  render(<ThemeToggle />)
+  render(<ThemeToggle />, { wrapper: ThemeProvider })
   // initial: system → resolved dark
   expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
 
@@ -65,7 +66,7 @@ test('cycling system → light → dark → system changes attribute correctly',
 
 test('clicking system → light stores "light" in localStorage', () => {
   mockMatchMedia(false)
-  render(<ThemeToggle />)
+  render(<ThemeToggle />, { wrapper: ThemeProvider })
   const btn = screen.getByRole('button')
   fireEvent.click(btn) // → light
   expect(localStorage.getItem('theme')).toBe('"light"')
@@ -73,7 +74,7 @@ test('clicking system → light stores "light" in localStorage', () => {
 
 test('button has an accessible aria-label', () => {
   mockMatchMedia(false)
-  render(<ThemeToggle />)
+  render(<ThemeToggle />, { wrapper: ThemeProvider })
   const btn = screen.getByRole('button')
   expect(btn).toHaveAttribute('aria-label')
   expect(btn.getAttribute('aria-label').length).toBeGreaterThan(0)
