@@ -36,3 +36,7 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
   .nav-link.active { background: transparent; color: var(--primary); }
   .main { padding-bottom: 64px; }
 }
+
+.hero { text-align: center; padding: 30px; }
+.hero-value { font-size: 44px; font-weight: 800; margin: 6px 0; }
+.hero-positive { border-color: var(--positive); }
