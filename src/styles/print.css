@@ -13,18 +13,27 @@
 
 /* ── Print media ─────────────────────────────────────────────────────────── */
 @media print {
-  /* Reveal the summary block */
-  .print-only {
-    display: block !important;
+  /* Bulletproof isolation: hide everything, then reveal only the print summary
+     and its descendants. This is page-independent — whatever page hosts
+     <PrintSummary/>, only the summary prints (no Settings/nav/etc. bleed). */
+  body * {
+    visibility: hidden;
+  }
+  .print-only,
+  .print-only * {
+    visibility: visible;
   }
 
-  /* Hide all app chrome */
-  .app > .nav,
-  .topbar,
-  .footer,
-  .no-print,
-  .nav-links,
-  nav {
+  /* Reveal + position the summary block at the top of the page */
+  .print-only {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  .no-print {
     display: none !important;
   }
 
