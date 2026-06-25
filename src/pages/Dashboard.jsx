@@ -5,8 +5,9 @@ import SavingsCard from '../components/SavingsCard.jsx'
 import { formatRM, formatPct } from '../engine/format.js'
 
 export default function Dashboard() {
-  const { profile, result, activeYear } = useProfile()
+  const { profile, result, activeYear, year } = useProfile()
   const months = profile.income.months
+  const actualCount = Object.values(year?.monthOverrides ?? {}).filter((o) => o?.confirmed).length
   const tracked = months.filter((m) => m.mainSalary > 0 || m.partTime.length > 0).length
   const chartData = months.map((m) => ({
     name: m.month.slice(5),
@@ -26,6 +27,9 @@ export default function Dashboard() {
           {formatRM(Math.abs(result.balance))}
         </div>
         <div className="stat-hint">{refund ? 'You may get this back' : 'Payable at e-Filing, April 2027'}</div>
+        <div className="actual-indicator">
+          📅 <strong>{actualCount}</strong> of 12 months actual · {12 - actualCount} projected
+        </div>
       </div>
 
       <div className="grid grid-3" style={{ marginTop: 16 }}>
