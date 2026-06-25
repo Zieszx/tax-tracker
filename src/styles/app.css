@@ -49,3 +49,7 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
 .part-row button { background: transparent; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--muted); }
 .btn-secondary { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--primary); font-weight: 600; }
 @media (max-width: 640px) { .part-row { grid-template-columns: 1fr 1fr; } }
+
+.relief { margin-bottom: 14px; }
+.relief-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.relief-hint { margin-top: 10px; font-size: 13px; color: var(--warn); }
