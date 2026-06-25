@@ -30,11 +30,15 @@ export default function Reliefs() {
 
       {profile.reliefs.map((r) => {
         const saving = savingIfMaxed(r)
+        const pct = r.limit > 0 ? Math.min(100, (r.amount / r.limit) * 100) : 0
         return (
           <div className="card relief" key={r.key}>
             <div className="relief-head">
-              <strong>{r.label}</strong>
-              <span className="stat-hint">limit {formatRM(r.limit)}</span>
+              <strong style={{ fontWeight: 800 }}>{r.label}</strong>
+              <span className="stat-hint">
+                limit {formatRM(r.limit)}
+                {pct >= 100 && <span style={{ marginLeft: 6, color: 'var(--positive)', fontWeight: 700 }}>✓ maxed</span>}
+              </span>
             </div>
             <label className="field">
               <span>Amount claimed</span>
@@ -53,8 +57,9 @@ export default function Reliefs() {
         )
       })}
 
-      <div className="card" style={{ marginTop: 16 }}>
-        <strong>Total reliefs: {formatRM(result.totalReliefs)}</strong>
+      <div className="card" style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span className="stat-label">Total reliefs</span>
+        <strong style={{ fontSize: 22, fontWeight: 800, color: 'var(--gold)' }}>{formatRM(result.totalReliefs)}</strong>
       </div>
     </div>
   )
