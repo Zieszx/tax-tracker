@@ -15,6 +15,7 @@ import { useVault } from '../security/useVault.jsx'
 import { useProfile } from '../hooks/useProfile.js'
 import { useTheme } from '../components/ThemeProvider.jsx'
 import Button from '../components/Button.jsx'
+import PrintSummary from '../components/PrintSummary.jsx'
 
 // ── theme helpers ──────────────────────────────────────────────────────────
 
@@ -316,6 +317,23 @@ export default function Settings() {
           </Button>
         </div>
       </section>
+
+      {/* ── Export PDF ────────────────────────────────────────────────────── */}
+      <section className="card settings-section" aria-labelledby="pdf-heading">
+        <h3 className="settings-heading" id="pdf-heading">Export PDF</h3>
+        <p className="settings-hint">
+          Print or save a clean one-page tax summary (no personal identifiers) as a PDF.
+          Your browser's print dialog will open — choose "Save as PDF" to save a file.
+        </p>
+        <div className="settings-actions">
+          <Button variant="gold" onClick={() => window.print()}>
+            Export PDF
+          </Button>
+        </div>
+      </section>
+
+      {/* PrintSummary: hidden on screen, visible only when printing */}
+      <PrintSummary />
 
       {/* ── Reset app ─────────────────────────────────────────────────────── */}
       <section className="card settings-section settings-danger" aria-labelledby="reset-heading">

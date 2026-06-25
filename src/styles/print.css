@@ -1,0 +1,112 @@
+/**
+ * print.css — Task 4.3
+ *
+ * Screen: hide .print-only (so PrintSummary is invisible during normal use).
+ * Print: hide app chrome (.app, .nav, .topbar, .footer, .no-print) and reveal
+ *        .print-only. Reset colours and layout for a clean one-page printout.
+ */
+
+/* ── Screen: hide the print-only region ─────────────────────────────────── */
+.print-only {
+  display: none;
+}
+
+/* ── Print media ─────────────────────────────────────────────────────────── */
+@media print {
+  /* Reveal the summary block */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Hide all app chrome */
+  .app > .nav,
+  .topbar,
+  .footer,
+  .no-print,
+  .nav-links,
+  nav {
+    display: none !important;
+  }
+
+  /* Reset body for printing */
+  body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #000;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 11pt;
+  }
+
+  /* ── Print summary layout ────────────────────────────────────────────── */
+  .print-summary {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .print-title {
+    font-size: 18pt;
+    font-weight: bold;
+    margin: 0 0 4pt;
+  }
+
+  .print-subtitle {
+    font-size: 10pt;
+    color: #444;
+    margin: 0 0 4pt;
+  }
+
+  /* ── Table ────────────────────────────────────────────────────────────── */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16pt;
+    font-size: 10pt;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 1px solid #999;
+    padding: 5pt 7pt;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .print-table th {
+    background: #f0f0f0;
+    font-weight: bold;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .print-amount {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .print-note {
+    color: #555;
+    font-size: 9pt;
+  }
+
+  .print-row-balance td {
+    background: #f9f9f9;
+    font-weight: bold;
+  }
+
+  .print-footer {
+    margin-top: 20pt;
+    font-size: 9pt;
+    color: #444;
+    border-top: 1px solid #ccc;
+    padding-top: 8pt;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4 portrait;
+    margin: 20mm;
+  }
+}
