@@ -58,3 +58,8 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
 .tax-table th, .tax-table td { text-align: right; padding: 8px; border-bottom: 1px solid var(--border); }
 .tax-table th:first-child, .tax-table td:first-child { text-align: left; }
 .scenario-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--border); }
+
+.be-steps { padding-left: 18px; display: flex; flex-direction: column; gap: 14px; }
+.be-field { display: flex; justify-content: space-between; gap: 12px; }
+.be-checklist { padding-left: 18px; line-height: 1.9; }
+.data-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
