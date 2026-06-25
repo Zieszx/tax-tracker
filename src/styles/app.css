@@ -40,3 +40,12 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
 .hero { text-align: center; padding: 30px; }
 .hero-value { font-size: 44px; font-weight: 800; margin: 6px 0; }
 .hero-positive { border-color: var(--positive); }
+
+.income-month { margin-bottom: 14px; }
+.income-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; font-size: 13px; color: var(--muted); }
+.field input, .part-row input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text); font-size: 14px; }
+.part-row { display: grid; grid-template-columns: 1.2fr 1fr 1.6fr auto; gap: 8px; margin-bottom: 8px; }
+.part-row button { background: transparent; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--muted); }
+.btn-secondary { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--primary); font-weight: 600; }
+@media (max-width: 640px) { .part-row { grid-template-columns: 1fr 1fr; } }
