@@ -8,7 +8,7 @@ import ThemeToggle from './components/ThemeToggle.jsx'
 import LockButton from './components/LockButton.jsx'
 import Footer from './components/Footer.jsx'
 import Dashboard from './pages/Dashboard.jsx'
-import IncomeLog from './pages/IncomeLog.jsx'
+import Income from './pages/Income.jsx'
 import Reliefs from './pages/Reliefs.jsx'
 import TaxCalc from './pages/TaxCalc.jsx'
 import BorangGuide from './pages/BorangGuide.jsx'
@@ -49,7 +49,7 @@ function AppShell() {
           <div className="container">
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/income" element={<IncomeLog />} />
+              <Route path="/income" element={<Income />} />
               <Route path="/reliefs" element={<Reliefs />} />
               <Route path="/calc" element={<TaxCalc />} />
               <Route path="/guide" element={<BorangGuide />} />

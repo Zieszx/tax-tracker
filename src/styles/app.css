@@ -71,6 +71,48 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
 .btn-dark .btn-ink, :root[data-theme="dark"] .btn-ink{background:#000;}
 .btn-ghost{background:transparent;color:var(--ink);}
 
+/* ── Income page (Task 3.1) ─────────────────────────────────────────────── */
+.income-section { margin-bottom: 28px; }
+.income-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.income-section-title { margin: 0; font-size: 18px; font-weight: 800; color: var(--ink); }
+.income-empty { color: var(--muted); text-align: center; padding: 28px; }
+.income-annual { display: flex; flex-direction: column; gap: 4px; }
+.income-annual-value { font-size: 28px; font-weight: 800; color: var(--gold); }
+
+/* Source cards grid — 2-col ≥768px, 1-col below */
+.sources-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 767px) { .sources-grid { grid-template-columns: 1fr; } }
+
+/* SourceCard */
+.source-card { display: flex; flex-direction: column; gap: 10px; }
+.source-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+.source-badge { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 3px 9px; border-radius: 6px; border: 1.5px solid var(--border); }
+.source-badge-main { background: var(--gold); color: #1a1408; }
+.source-badge-part { background: var(--pink); color: #fff; }
+.source-remove-btn { background: transparent; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--muted); padding: 4px 8px; min-height: 32px; line-height: 1; transition: color .15s; }
+.source-remove-btn:hover { color: var(--pink); border-color: var(--pink); }
+.source-checkbox-row { flex-direction: row !important; align-items: center; gap: 8px; cursor: pointer; }
+.source-checkbox-row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--gold); }
+.source-months-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.source-months-field { flex: 1 1 80px; min-width: 70px; }
+.field-label { font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.field select { background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--ink); font-size: 14px; cursor: pointer; }
+
+/* Override log table */
+.override-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.override-table th { text-align: left; padding: 10px 12px; background: var(--paper); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 2px solid var(--border); }
+.override-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.override-row:last-child td { border-bottom: none; }
+.override-projected { color: var(--muted); }
+.override-input { background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; color: var(--ink); font-size: 13px; width: 100px; }
+.override-input:focus { outline: 2px solid var(--gold); }
+.override-clear-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--muted); padding: 3px 7px; font-size: 11px; }
+.override-clear-btn:hover { color: var(--pink); border-color: var(--pink); }
+@media (max-width: 640px) {
+  .override-table th:nth-child(2), .override-table td:nth-child(2) { display: none; }
+  .override-input { width: 80px; }
+}
+
 /* ── Lock screen (Task 2.2) ─────────────────────────────────────────────── */
 .lock-backdrop {
   min-height: 100vh;
