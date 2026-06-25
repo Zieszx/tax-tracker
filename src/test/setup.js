@@ -8,3 +8,16 @@ if (typeof ResizeObserver === 'undefined') {
     disconnect() {}
   }
 }
+
+// Polyfill window.matchMedia for jsdom (used by ThemeToggle prefers-color-scheme)
+if (typeof window.matchMedia === 'undefined') {
+  window.matchMedia = (query) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })
+}

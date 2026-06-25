@@ -1,15 +1,18 @@
-import { useEffect } from 'react'
-import { useLocalStorage } from '../hooks/useLocalStorage.js'
+import { useTheme } from './ThemeProvider.jsx'
+
+const LABELS = { system: 'Theme: following device', light: 'Theme: light', dark: 'Theme: dark' }
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useLocalStorage('theme', 'light')
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
+  const { theme, cycle } = useTheme()
+  const icon = theme === 'dark' ? '☀️' : theme === 'light' ? '🌙' : '🖥'
+
   return (
-    <button className="theme-toggle" aria-label="Toggle dark mode"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-      {theme === 'dark' ? '☀️' : '🌙'}
+    <button
+      className="theme-toggle"
+      aria-label={LABELS[theme] || 'Toggle theme'}
+      onClick={cycle}
+    >
+      {icon}
     </button>
   )
 }

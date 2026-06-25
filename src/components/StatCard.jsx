@@ -1,4 +1,4 @@
-export default function StatCard({ label, value, accent = 'primary', hint }) {
+export default function StatCard({ label, value, accent = 'gold', hint }) {
   return (
     <div className="card stat-card">
       <div className="stat-label">{label}</div>
