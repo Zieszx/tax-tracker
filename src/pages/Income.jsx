@@ -14,6 +14,7 @@ import { materializeMonths } from '../state/materialize.js'
 import { formatRM } from '../engine/format.js'
 import SourceCard from '../components/SourceCard.jsx'
 import ImportCsvModal from '../components/ImportCsvModal.jsx'
+import RecordIncomeForm, { defaultRecordMonth } from '../components/RecordIncomeForm.jsx'
 
 let _nextId = Date.now()
 function newId() {
@@ -58,6 +59,8 @@ export default function Income() {
   const sources = year?.incomeSources ?? []
   const overrides = year?.monthOverrides ?? {}
   const taxYear = year?.taxYear ?? 2026
+  // The current calendar month, only when viewing the current year.
+  const thisMonth = new Date().getFullYear() === taxYear ? defaultRecordMonth(taxYear) : null
 
   // Projected months from current sources + overrides
   const months = materializeMonths(sources, overrides, taxYear)
@@ -131,9 +134,12 @@ export default function Income() {
     <div>
       <h2 className="page-title">Income</h2>
       <p className="subtitle">
-        Define your income sources. The engine projects all 12 months automatically —
-        override individual months below where needed.
+        Record each month's actual income as it happens, or define income sources that
+        project the rest of the year. Override any individual month below.
       </p>
+
+      {/* ── Record income (flexible monthly submission) ───────────────────── */}
+      <RecordIncomeForm />
 
       {/* ── Section: Income Sources ───────────────────────────────────────── */}
       <section className="income-section">
@@ -205,6 +211,7 @@ export default function Income() {
             <thead>
               <tr>
                 <th>Month</th>
+                <th>Status</th>
                 <th>Projected main (RM)</th>
                 <th>Override main (RM)</th>
                 <th>Projected part-time (RM)</th>
@@ -217,7 +224,9 @@ export default function Income() {
               {months.map((m) => {
                 const mainOverridden = overrides[m.month]?.mainSalary !== undefined
                 const partOverridden = overrides[m.month]?.partTime !== undefined
+                const isActual = overrides[m.month]?.confirmed === true
                 const hasOverride = mainOverridden || partOverridden
+                const isCurrent = m.month === thisMonth
                 const ptTotal = m.partTime.reduce((s, p) => s + (p.amount || 0), 0)
 
                 const proj = projectedOf(m.month)
@@ -228,8 +237,16 @@ export default function Income() {
                 )
 
                 return (
-                  <tr key={m.month} className="override-row">
-                    <td>{m.month}</td>
+                  <tr key={m.month} className={`override-row${isCurrent ? ' is-current' : ''}`}>
+                    <td>
+                      {m.month}
+                      {isCurrent && <span className="current-tag">this month</span>}
+                    </td>
+                    <td>
+                      <span className={`override-status ${isActual ? 'is-actual' : 'is-projected'}`}>
+                        {isActual ? 'Actual' : 'Projected'}
+                      </span>
+                    </td>
                     <td className="override-projected">{formatRM(projectedMain)}</td>
                     <td>
                       <input

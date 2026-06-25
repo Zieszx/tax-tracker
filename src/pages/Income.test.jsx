@@ -175,6 +175,27 @@ test('overriding a month part-time updates projected annual gross', async () => 
   )
 })
 
+test('override log shows Actual/Projected status (confirmed month → Actual)', async () => {
+  const withActual = {
+    ...projectionData,
+    years: {
+      2026: {
+        ...projectionYear,
+        monthOverrides: { '2026-02': { mainSalary: 4500, partTime: [], confirmed: true } },
+      },
+    },
+  }
+  render(wrap(<Income />, withActual))
+  await waitFor(() =>
+    expect(screen.getByText(/month override log/i)).toBeInTheDocument()
+  )
+  await waitFor(() => {
+    // at least one Actual (the confirmed Feb) and Projected (the rest)
+    expect(screen.getAllByText(/^Actual$/i).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/^Projected$/i).length).toBeGreaterThanOrEqual(1)
+  })
+})
+
 test('override log shows materialized months (12 rows)', async () => {
   render(wrap(<Income />))
   await waitFor(() =>
