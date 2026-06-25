@@ -53,7 +53,7 @@ export default function Income() {
     )
   }
 
-  const { year, setYear, result } = ctx
+  const { year, setYear } = ctx
   const [csvModalOpen, setCsvModalOpen] = useState(false)
   const sources = year?.incomeSources ?? []
   const overrides = year?.monthOverrides ?? {}

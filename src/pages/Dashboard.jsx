@@ -5,7 +5,7 @@ import SavingsCard from '../components/SavingsCard.jsx'
 import { formatRM, formatPct } from '../engine/format.js'
 
 export default function Dashboard() {
-  const { profile, result } = useProfile()
+  const { profile, result, activeYear } = useProfile()
   const months = profile.income.months
   const tracked = months.filter((m) => m.mainSalary > 0 || m.partTime.length > 0).length
   const chartData = months.map((m) => ({
@@ -18,7 +18,7 @@ export default function Dashboard() {
   return (
     <div>
       <h2 className="page-title">Dashboard</h2>
-      <p className="subtitle">Your 2026 tax at a glance.</p>
+      <p className="subtitle">Your {activeYear} tax at a glance.</p>
 
       <div className={`card hero ${refund ? 'hero-positive' : ''}`}>
         <div className="stat-label">{refund ? 'Estimated Refund' : 'Estimated Balance Due'}</div>

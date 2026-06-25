@@ -125,6 +125,66 @@ test('setYear updates the active year profile and recomputes result', async () =
   })
 })
 
+// ── Regression: setProfile (relief edit) must not freeze the projection ───────
+
+test('setProfile relief edit keeps monthOverrides empty so sources still project', async () => {
+  const blankWithSource = {
+    schemaVersion: 2,
+    settings: { theme: 'system', autoLockMinutes: 5, onboarded: true },
+    activeYear: 2026,
+    years: {
+      2026: {
+        taxYear: 2026,
+        residentStatus: 'resident',
+        maritalStatus: 'single',
+        incomeSources: [
+          { id: 'm', type: 'main', name: 'Job', monthlyGross: 4000, monthsActive: { from: 1, to: 12 }, autoStatutory: true },
+        ],
+        monthOverrides: {},
+        pcbPaid: [],
+        reliefs: [{ key: 'personal', label: 'Personal', amount: 9000, limit: 9000, auto: true }],
+        savings: { entries: [] },
+      },
+    },
+  }
+  const { Wrapper, hookRef } = createHarness(blankWithSource)
+  render(<Wrapper />)
+
+  await waitFor(() => {
+    expect(hookRef.current?.result).toBeDefined()
+  })
+
+  // Projected gross = 4000 × 12 = 48000
+  expect(hookRef.current.result.totalGross).toBeCloseTo(48000, 2)
+
+  // Edit reliefs through the legacy bridge (exactly what the Reliefs page does)
+  await act(async () => {
+    await hookRef.current.setProfile({
+      ...hookRef.current.profile,
+      reliefs: [{ key: 'personal', label: 'Personal', amount: 9000, limit: 9000, auto: true }],
+    })
+  })
+
+  // The relief edit must NOT pin the 12 months as overrides
+  await waitFor(() => {
+    expect(Object.keys(hookRef.current.year.monthOverrides)).toHaveLength(0)
+  })
+
+  // Changing the source salary must still flow through to the projection
+  await act(async () => {
+    await hookRef.current.setYear((yr) => ({
+      ...yr,
+      incomeSources: yr.incomeSources.map((s) =>
+        s.type === 'main' ? { ...s, monthlyGross: 5000 } : s
+      ),
+    }))
+  })
+
+  await waitFor(() => {
+    expect(hookRef.current.result.totalGross).toBeCloseTo(60000, 2)
+  })
+})
+
 // ── Backward-compatibility tests (importJson / exportJson / etc.) ─────────────
 
 test('importJson throws unified error on malformed JSON', async () => {

@@ -87,22 +87,15 @@ export function ProfileProvider({ children }) {
   }
 
   // ── setProfile (legacy bridge) ────────────────────────────────────────────
-  // Accepts an engine-shaped profile and converts it back to vault writes.
-  // months → monthOverrides (keyed by month string); reliefs → stored directly.
+  // Accepts an engine-shaped profile and writes back ONLY the fields a consumer
+  // can edit through this bridge: reliefs and pcbPaid. It deliberately does NOT
+  // touch incomeSources or monthOverrides — rebuilding monthOverrides from the
+  // materialized months would pin all 12 months and silently freeze the income
+  // projection (a source change would no longer affect any month). Month edits
+  // go through the Income page's setYear, not this bridge.
   async function setProfile(nextEngineProfile) {
     await save((appData) => {
       const yr = appData.years?.[activeYear] ?? blankYearProfile(activeYear)
-
-      // Build monthOverrides from the new months array
-      const monthOverrides = {}
-      const months = nextEngineProfile?.income?.months ?? []
-      for (const m of months) {
-        monthOverrides[m.month] = {
-          mainSalary: m.mainSalary,
-          partTime: m.partTime ? m.partTime.map((p) => ({ ...p })) : [],
-        }
-      }
-
       return {
         ...appData,
         years: {
@@ -111,7 +104,6 @@ export function ProfileProvider({ children }) {
             ...yr,
             reliefs: nextEngineProfile?.reliefs ?? yr.reliefs,
             pcbPaid: nextEngineProfile?.pcbPaid ?? yr.pcbPaid,
-            monthOverrides,
           },
         },
       }
