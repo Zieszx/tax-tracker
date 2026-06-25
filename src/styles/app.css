@@ -53,3 +53,8 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
 .relief { margin-bottom: 14px; }
 .relief-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .relief-hint { margin-top: 10px; font-size: 13px; color: var(--warn); }
+
+.tax-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+.tax-table th, .tax-table td { text-align: right; padding: 8px; border-bottom: 1px solid var(--border); }
+.tax-table th:first-child, .tax-table td:first-child { text-align: left; }
+.scenario-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--border); }
