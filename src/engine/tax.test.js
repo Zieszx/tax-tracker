@@ -11,10 +11,23 @@ test('calcGrossTax returns 0 at or below 5000', () => {
   expect(calcGrossTax(0).total).toBeCloseTo(0, 2)
 })
 
-test('calcGrossTax breakdown only includes brackets with taxable amount', () => {
+test('calcGrossTax breakdown has 3 non-zero bands for 30000 chargeable', () => {
   const { breakdown } = calcGrossTax(30000)
   const taxedBands = breakdown.filter(b => b.taxable > 0)
   expect(taxedBands.length).toBe(3)
+})
+
+test('calcGrossTax returns 0 for negative chargeable income', () => {
+  expect(calcGrossTax(-1000).total).toBe(0)
+})
+
+test('calcGrossTax honors custom brackets override', () => {
+  const customBrackets = [
+    { min: 0, max: 1000, rate: 0 },
+    { min: 1000, max: null, rate: 0.5 },
+  ]
+  // 2000 chargeable: 0 on first 1000, then 1000 * 0.5 = 500
+  expect(calcGrossTax(2000, customBrackets).total).toBeCloseTo(500, 2)
 })
 
 test('sumIncome totals main and part-time', () => {

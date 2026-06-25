@@ -23,7 +23,9 @@ export function ProfileProvider({ children }) {
       } catch {
         throw new Error('Invalid profile file')
       }
-      if (!parsed.income || !parsed.reliefs) throw new Error('Invalid profile file')
+      if (!Array.isArray(parsed.income?.months) || !Array.isArray(parsed.reliefs)) {
+        throw new Error('Invalid profile file')
+      }
       setProfile(parsed)
     },
   }
