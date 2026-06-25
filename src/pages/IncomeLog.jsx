@@ -13,7 +13,7 @@ export default function IncomeLog() {
   }
   const addPart = (i) => {
     const next = months.map((m, idx) => idx === i
-      ? { ...m, partTime: [...m.partTime, { date: `${m.month}-01`, amount: 0, note: '' }] } : m)
+      ? { ...m, partTime: [...m.partTime, { id: `${m.month}-${m.partTime.length}-${Date.now()}`, date: `${m.month}-01`, amount: 0, note: '' }] } : m)
     update(next)
   }
   const setPart = (i, j, field, val) => {
@@ -51,7 +51,7 @@ export default function IncomeLog() {
               value={m.mainSalary} onChange={(e) => setMain(i, e.target.value)} />
           </label>
           {m.partTime.map((p, j) => (
-            <div className="part-row" key={j}>
+            <div className="part-row" key={p.id ?? j}>
               <input type="date" aria-label={`part date ${m.month} ${j}`}
                 value={p.date} onChange={(e) => setPart(i, j, 'date', e.target.value)} />
               <input type="number" aria-label={`part amount ${m.month} ${j}`}
@@ -61,7 +61,7 @@ export default function IncomeLog() {
               <button onClick={() => delPart(i, j)} aria-label="delete payment">✕</button>
             </div>
           ))}
-          <button className="btn-secondary" onClick={() => addPart(i)}>+ Add part-time payment</button>
+          <button className="btn-secondary" aria-label={`add part-time payment ${m.month}`} onClick={() => addPart(i)}>+ Add part-time payment</button>
         </div>
       ))}
 
