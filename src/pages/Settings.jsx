@@ -79,6 +79,9 @@ export default function Settings() {
       ...d,
       settings: { ...d.settings, theme },
     }))
+    // Keep localStorage['theme'] in sync so ThemeToggle applies the change
+    // immediately without requiring a page reload.
+    try { localStorage.setItem('theme', theme) } catch (_) { /* ignore */ }
     setThemeSaved(true)
     setTimeout(() => setThemeSaved(false), 2000)
   }
@@ -131,6 +134,7 @@ export default function Settings() {
   // ── Import JSON ───────────────────────────────────────────────────────────
 
   function handleImportFile(e) {
+    if (!profile) return
     const file = e.target.files?.[0]
     if (!file) return
     setImportError('')
