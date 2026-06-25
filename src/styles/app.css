@@ -463,3 +463,159 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; }
     font-size: 20px;
   }
 }
+
+/* ── Settings page (Task 2.6) ───────────────────────────────────────────── */
+.settings-section {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-heading {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.settings-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 180px;
+}
+
+.settings-input {
+  background: var(--paper);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 80px;
+}
+
+.settings-input:focus {
+  border-color: var(--gold);
+}
+
+.settings-select {
+  background: var(--paper);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.settings-select:focus {
+  border-color: var(--gold);
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.settings-field .settings-label {
+  min-width: unset;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-saved {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--positive);
+  letter-spacing: 0.02em;
+}
+
+.settings-error {
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(255, 93, 143, 0.1);
+  border: 1px solid rgba(255, 93, 143, 0.35);
+  border-radius: 8px;
+  color: var(--pink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-success {
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  color: var(--positive);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.settings-danger {
+  border-color: rgba(255, 93, 143, 0.45);
+}
+
+.settings-danger-btn {
+  color: var(--pink);
+  border-color: rgba(255, 93, 143, 0.5);
+}
+
+.settings-reset-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-reset-prompt {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .settings-label {
+    min-width: unset;
+  }
+
+  .settings-input,
+  .settings-select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

@@ -11,6 +11,7 @@ import IncomeLog from './pages/IncomeLog.jsx'
 import Reliefs from './pages/Reliefs.jsx'
 import TaxCalc from './pages/TaxCalc.jsx'
 import BorangGuide from './pages/BorangGuide.jsx'
+import Settings from './pages/Settings.jsx'
 import Lock from './pages/Lock.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 
@@ -51,6 +52,7 @@ function AppShell() {
               <Route path="/reliefs" element={<Reliefs />} />
               <Route path="/calc" element={<TaxCalc />} />
               <Route path="/guide" element={<BorangGuide />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </div>
           <Footer />

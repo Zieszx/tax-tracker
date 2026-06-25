@@ -6,6 +6,7 @@ const links = [
   { to: '/reliefs', label: 'Reliefs', icon: '🎯' },
   { to: '/calc', label: 'Tax Calc', icon: '🧮' },
   { to: '/guide', label: 'BE Guide', icon: '📋' },
+  { to: '/settings', label: 'Settings', icon: '⚙️' },
 ]
 
 export default function Nav() {
