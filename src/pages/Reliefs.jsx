@@ -43,7 +43,7 @@ export default function Reliefs() {
                 onChange={(e) => setAmount(r.key, e.target.value)} />
             </label>
             <ProgressBar value={r.amount} max={r.limit}
-              accent={r.amount >= r.limit ? 'positive' : 'primary'} />
+              accent={r.amount >= r.limit ? 'positive' : 'gold'} />
             {saving > 0.5 && (
               <div className="relief-hint">
                 💡 Top up to {formatRM(r.limit)} → save about {formatRM(saving)} in tax.

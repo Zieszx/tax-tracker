@@ -21,7 +21,7 @@ export default function Dashboard() {
 
       <div className={`card hero ${refund ? 'hero-positive' : ''}`}>
         <div className="stat-label">{refund ? 'Estimated Refund' : 'Estimated Balance Due'}</div>
-        <div className="hero-value" style={{ color: refund ? 'var(--positive)' : 'var(--text)' }}>
+        <div className="hero-value" style={{ color: refund ? 'var(--positive)' : 'var(--ink)' }}>
           {formatRM(Math.abs(result.balance))}
         </div>
         <div className="stat-hint">{refund ? 'You may get this back' : 'Payable at e-Filing, April 2027'}</div>
@@ -29,12 +29,12 @@ export default function Dashboard() {
 
       <div className="grid grid-3" style={{ marginTop: 16 }}>
         <StatCard label="Total Gross" value={formatRM(result.totalGross)} />
-        <StatCard label="Chargeable Income" value={formatRM(result.chargeableIncome)} accent="warn" />
+        <StatCard label="Chargeable Income" value={formatRM(result.chargeableIncome)} accent="pink" />
         <StatCard label="PCB Paid" value={formatRM(result.pcbPaid)} accent="positive" />
       </div>
       <div className="grid grid-2" style={{ marginTop: 16 }}>
         <StatCard label="Gross Tax" value={formatRM(result.grossTax)} />
-        <StatCard label="Effective Rate" value={formatPct(result.effectiveRate)} accent="warn"
+        <StatCard label="Effective Rate" value={formatPct(result.effectiveRate)} accent="pink"
           hint={`${tracked}/12 months tracked — keep it up!`} />
       </div>
 
@@ -46,8 +46,8 @@ export default function Dashboard() {
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v) => formatRM(v)} />
-              <Bar dataKey="main" stackId="a" fill="var(--primary)" name="Main" />
-              <Bar dataKey="part" stackId="a" fill="var(--warn)" name="Part-time" />
+              <Bar dataKey="main" stackId="a" fill="var(--gold)" name="Main" />
+              <Bar dataKey="part" stackId="a" fill="var(--pink)" name="Part-time" />
             </BarChart>
           </ResponsiveContainer>
         </div>
