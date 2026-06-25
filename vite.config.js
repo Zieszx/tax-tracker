@@ -10,6 +10,7 @@ export default defineConfig(({ command }) => ({
       ? [
           VitePWA({
             registerType: 'autoUpdate',
+            includeAssets: ['apple-touch-icon.png', 'pwa-192.png', 'pwa-512.png'],
             manifest: {
               name: 'Tax Tracker 2026',
               short_name: 'Tax26',
