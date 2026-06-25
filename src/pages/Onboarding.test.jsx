@@ -178,3 +178,71 @@ test('import v1 option shown when localStorage tax-profile-2026 exists', async (
     expect(screen.getByRole('button', { name: /import v1|import existing/i })).toBeInTheDocument()
   })
 })
+
+test('import v1: clicking import calls createVault with migrated data and removes plaintext', async () => {
+  const createVault = vi.fn().mockResolvedValue(undefined)
+  useVault.mockReturnValue(makeVault({ createVault }))
+
+  // Seed a v1 profile in localStorage
+  const { defaultProfile } = await import('../data/defaultProfile.js')
+  localStorage.setItem('tax-profile-2026', JSON.stringify(defaultProfile))
+
+  render(<Onboarding />)
+
+  await advancePastWelcome()
+
+  const passInput = screen.getByLabelText(/^passcode$/i)
+  const confirmInput = screen.getByLabelText(/confirm passcode/i)
+  fireEvent.change(passInput, { target: { value: 'importpass1' } })
+  fireEvent.change(confirmInput, { target: { value: 'importpass1' } })
+  fireEvent.click(screen.getByRole('button', { name: /next/i }))
+
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: /import v1|import existing/i })).toBeInTheDocument()
+  })
+
+  fireEvent.click(screen.getByRole('button', { name: /import v1|import existing/i }))
+
+  await waitFor(() => {
+    expect(createVault).toHaveBeenCalledTimes(1)
+  })
+
+  const [calledPasscode, calledData] = createVault.mock.calls[0]
+  expect(calledPasscode).toBe('importpass1')
+  expect(calledData.settings.onboarded).toBe(true)
+  expect(calledData.years[2026].incomeSources.length).toBeGreaterThan(0)
+
+  // Plaintext v1 data must be removed from localStorage after successful import
+  expect(localStorage.getItem('tax-profile-2026')).toBeNull()
+})
+
+test('import v1: blank/sample paths also remove plaintext v1 data', async () => {
+  const createVault = vi.fn().mockResolvedValue(undefined)
+  useVault.mockReturnValue(makeVault({ createVault }))
+
+  const { defaultProfile } = await import('../data/defaultProfile.js')
+  localStorage.setItem('tax-profile-2026', JSON.stringify(defaultProfile))
+
+  render(<Onboarding />)
+
+  await advancePastWelcome()
+
+  const passInput = screen.getByLabelText(/^passcode$/i)
+  const confirmInput = screen.getByLabelText(/confirm passcode/i)
+  fireEvent.change(passInput, { target: { value: 'blankpass1' } })
+  fireEvent.change(confirmInput, { target: { value: 'blankpass1' } })
+  fireEvent.click(screen.getByRole('button', { name: /next/i }))
+
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: /start blank/i })).toBeInTheDocument()
+  })
+
+  fireEvent.click(screen.getByRole('button', { name: /start blank/i }))
+
+  await waitFor(() => {
+    expect(createVault).toHaveBeenCalledTimes(1)
+  })
+
+  // Plaintext v1 data must be removed even when user chose not to import
+  expect(localStorage.getItem('tax-profile-2026')).toBeNull()
+})

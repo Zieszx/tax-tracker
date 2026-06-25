@@ -131,13 +131,19 @@ function StepPasscode({ onNext }) {
   )
 }
 
-function StepDataChoice({ passcode, onFinish }) {
+function StepDataChoice({ passcode }) {
   const { createVault } = useVault()
   const [busy, setBusy] = useState(false)
+  const [importError, setImportError] = useState('')
 
   // Check if v1 data exists in localStorage
   const v1Raw = localStorage.getItem('tax-profile-2026')
   const hasV1 = Boolean(v1Raw)
+
+  // Remove plaintext v1 data if present — caller chose not to import it
+  function clearV1Plaintext() {
+    localStorage.removeItem('tax-profile-2026')
+  }
 
   async function finish(appData) {
     if (busy) return
@@ -151,10 +157,12 @@ function StepDataChoice({ passcode, onFinish }) {
   }
 
   async function handleBlank() {
+    clearV1Plaintext()
     await finish(blankAppData(2026))
   }
 
   async function handleSample() {
+    clearV1Plaintext()
     const yearProfile = migrateV1(defaultProfile)
     const appData = blankAppData(2026)
     appData.years[2026] = yearProfile
@@ -168,7 +176,11 @@ function StepDataChoice({ passcode, onFinish }) {
       const appData = blankAppData(2026)
       appData.years[2026] = yearProfile
       await finish(appData)
+      // Only remove after a successful vault creation
+      localStorage.removeItem('tax-profile-2026')
     } catch {
+      setImportError('Could not read previous data — starting blank instead.')
+      clearV1Plaintext()
       await finish(blankAppData(2026))
     }
   }
@@ -224,6 +236,9 @@ function StepDataChoice({ passcode, onFinish }) {
         )}
       </div>
 
+      {importError && (
+        <p className="ob-error" role="alert">{importError}</p>
+      )}
       {busy && <p className="ob-busy">Setting up your vault…</p>}
     </div>
   )
