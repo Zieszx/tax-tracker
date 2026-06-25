@@ -10,7 +10,10 @@ export default function BorangGuide() {
     const blob = new Blob([exportJson()], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = 'tax-profile-2026.json'; a.click()
+    a.href = url; a.download = 'tax-profile-2026.json'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
   const onFile = (e) => {
