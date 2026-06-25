@@ -8,10 +8,12 @@
  * Writes: setYear(updater) for incomeSources and monthOverrides
  */
 
+import { useState } from 'react'
 import { useProfile } from '../hooks/useProfile.js'
 import { materializeMonths } from '../state/materialize.js'
 import { formatRM } from '../engine/format.js'
 import SourceCard from '../components/SourceCard.jsx'
+import ImportCsvModal from '../components/ImportCsvModal.jsx'
 
 let _nextId = Date.now()
 function newId() {
@@ -52,6 +54,7 @@ export default function Income() {
   }
 
   const { year, setYear, result } = ctx
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
   const sources = year?.incomeSources ?? []
   const overrides = year?.monthOverrides ?? {}
   const taxYear = year?.taxYear ?? 2026
@@ -124,13 +127,22 @@ export default function Income() {
       <section className="income-section">
         <div className="income-section-header">
           <h3 className="income-section-title">Income Sources</h3>
-          <button
-            className="btn btn-gold"
-            onClick={addSource}
-            aria-label="add part-time source"
-          >
-            + Add Source
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-ghost"
+              onClick={() => setCsvModalOpen(true)}
+              aria-label="import bank CSV"
+            >
+              ↑ Import CSV
+            </button>
+            <button
+              className="btn btn-gold"
+              onClick={addSource}
+              aria-label="add part-time source"
+            >
+              + Add Source
+            </button>
+          </div>
         </div>
 
         {sources.length === 0 ? (
@@ -156,6 +168,14 @@ export default function Income() {
         <span className="stat-label">Projected annual gross</span>
         <span className="stat-value income-annual-value">{formatRM(annualGross)}</span>
       </div>
+
+      {/* ── CSV Import Modal ─────────────────────────────────────────────── */}
+      <ImportCsvModal
+        open={csvModalOpen}
+        onClose={() => setCsvModalOpen(false)}
+        setYear={setYear}
+        year={year}
+      />
 
       {/* ── Section: Month Override Log ───────────────────────────────────── */}
       <section className="income-section">
