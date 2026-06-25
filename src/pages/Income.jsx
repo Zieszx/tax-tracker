@@ -93,18 +93,26 @@ export default function Income() {
     }))
   }
 
-  // Override log helpers
-  function setOverrideMain(monthKey, value) {
-    setYear((yr) => ({
-      ...yr,
-      monthOverrides: {
-        ...yr.monthOverrides,
-        [monthKey]: {
-          ...(yr.monthOverrides[monthKey] ?? {}),
-          mainSalary: parseFloat(value) || 0,
-        },
-      },
-    }))
+  // Override log helpers — main salary and part-time can be overridden
+  // independently per month. An empty input clears just that field; when a
+  // month has no remaining overrides the whole entry is removed.
+  function setOverrideField(monthKey, field, value) {
+    setYear((yr) => {
+      const existing = yr.monthOverrides[monthKey] ?? {}
+      const next = { ...existing }
+      const blank = value === '' || value == null
+      if (field === 'mainSalary') {
+        if (blank) delete next.mainSalary
+        else next.mainSalary = parseFloat(value) || 0
+      } else if (field === 'partTime') {
+        if (blank) delete next.partTime
+        else next.partTime = [{ date: `${monthKey}-15`, amount: parseFloat(value) || 0, note: 'Manual override' }]
+      }
+      const nextOverrides = { ...yr.monthOverrides }
+      if (Object.keys(next).length === 0) delete nextOverrides[monthKey]
+      else nextOverrides[monthKey] = next
+      return { ...yr, monthOverrides: nextOverrides }
+    })
   }
 
   function clearOverride(monthKey) {
@@ -114,6 +122,10 @@ export default function Income() {
       return { ...yr, monthOverrides: next }
     })
   }
+
+  // Projected (source-only) months — used for placeholder values in the log
+  const projectedMonths = materializeMonths(sources, {}, taxYear)
+  const projectedOf = (monthKey) => projectedMonths.find((x) => x.month === monthKey)
 
   return (
     <div>
@@ -181,9 +193,11 @@ export default function Income() {
       <section className="income-section">
         <h3 className="income-section-title">Month Override Log</h3>
         <p className="stat-hint" style={{ marginBottom: 12 }}>
-          The table below shows the projected income for each month. Edit the "Override
-          main" column to pin a specific gross for that month (overrides the source
-          projection). Clear to revert to the projected value.
+          The table shows the projected income for each month. Your salary isn't static —
+          edit <strong>Override main</strong> to pin a specific gross (e.g. RM 4,000 one
+          month, RM 4,500 another), and <strong>Override part-time</strong> to set that
+          month's part-time total. Leave a field blank to use the projected value; ✕ clears
+          the whole month.
         </p>
 
         <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
@@ -193,22 +207,25 @@ export default function Income() {
                 <th>Month</th>
                 <th>Projected main (RM)</th>
                 <th>Override main (RM)</th>
-                <th>Part-time total (RM)</th>
+                <th>Projected part-time (RM)</th>
+                <th>Override part-time (RM)</th>
                 <th>Month total (RM)</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {months.map((m) => {
-                const hasOverride = overrides[m.month]?.mainSalary !== undefined
-                const ptTotal = m.partTime.reduce(
+                const mainOverridden = overrides[m.month]?.mainSalary !== undefined
+                const partOverridden = overrides[m.month]?.partTime !== undefined
+                const hasOverride = mainOverridden || partOverridden
+                const ptTotal = m.partTime.reduce((s, p) => s + (p.amount || 0), 0)
+
+                const proj = projectedOf(m.month)
+                const projectedMain = proj?.mainSalary ?? 0
+                const projectedPart = (proj?.partTime ?? []).reduce(
                   (s, p) => s + (p.amount || 0),
                   0
                 )
-                // Projected main (from sources only, ignoring override)
-                const projectedMain = materializeMonths(sources, {}, taxYear).find(
-                  (x) => x.month === m.month
-                )?.mainSalary ?? 0
 
                 return (
                   <tr key={m.month} className="override-row">
@@ -219,14 +236,26 @@ export default function Income() {
                         type="number"
                         aria-label={`override main salary ${m.month}`}
                         className="override-input"
-                        value={hasOverride ? m.mainSalary : ''}
+                        value={mainOverridden ? m.mainSalary : ''}
                         placeholder={formatRM(projectedMain)}
-                        onChange={(e) => setOverrideMain(m.month, e.target.value)}
+                        onChange={(e) => setOverrideField(m.month, 'mainSalary', e.target.value)}
                         min="0"
                         step="100"
                       />
                     </td>
-                    <td>{formatRM(ptTotal)}</td>
+                    <td className="override-projected">{formatRM(projectedPart)}</td>
+                    <td>
+                      <input
+                        type="number"
+                        aria-label={`override part-time ${m.month}`}
+                        className="override-input"
+                        value={partOverridden ? ptTotal : ''}
+                        placeholder={formatRM(projectedPart)}
+                        onChange={(e) => setOverrideField(m.month, 'partTime', e.target.value)}
+                        min="0"
+                        step="50"
+                      />
+                    </td>
                     <td>{formatRM(m.mainSalary + ptTotal)}</td>
                     <td>
                       {hasOverride && (
@@ -234,7 +263,7 @@ export default function Income() {
                           className="override-clear-btn"
                           aria-label={`clear override ${m.month}`}
                           onClick={() => clearOverride(m.month)}
-                          title="Clear override"
+                          title="Clear month overrides"
                         >
                           ✕
                         </button>

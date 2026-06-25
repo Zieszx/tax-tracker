@@ -150,6 +150,31 @@ test('editing main monthlyGross updates projected annual gross value', async () 
   )
 })
 
+test('overriding a month part-time updates projected annual gross', async () => {
+  // projectionData: single main source (3000/mo = 36,000), no part-time
+  render(wrap(<Income />, projectionData))
+  await waitFor(() =>
+    expect(screen.getByDisplayValue(/Test Corp/i)).toBeInTheDocument()
+  )
+  await waitFor(() => {
+    expect(document.querySelector('.income-annual-value').textContent).toMatch(/36,000/)
+  })
+
+  // Override January part-time to 500 → annual gross becomes 36,500
+  const partInput = screen.getByLabelText(/override part-time 2026-01/i)
+  await act(async () => {
+    fireEvent.change(partInput, { target: { value: '500' } })
+    await new Promise((r) => setTimeout(r, 50))
+  })
+
+  await waitFor(
+    () => {
+      expect(document.querySelector('.income-annual-value').textContent).toMatch(/36,500/)
+    },
+    { timeout: 3000 }
+  )
+})
+
 test('override log shows materialized months (12 rows)', async () => {
   render(wrap(<Income />))
   await waitFor(() =>
