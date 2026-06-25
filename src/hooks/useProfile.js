@@ -17,7 +17,12 @@ export function ProfileProvider({ children }) {
     clearToBlank: () => setProfile(blankProfile),
     exportJson: () => JSON.stringify(profile, null, 2),
     importJson: (text) => {
-      const parsed = JSON.parse(text)
+      let parsed
+      try {
+        parsed = JSON.parse(text)
+      } catch {
+        throw new Error('Invalid profile file')
+      }
       if (!parsed.income || !parsed.reliefs) throw new Error('Invalid profile file')
       setProfile(parsed)
     },
