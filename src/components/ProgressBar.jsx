@@ -1,7 +1,14 @@
-export default function ProgressBar({ value, max, accent = 'gold' }) {
+export default function ProgressBar({ value, max, accent = 'gold', 'data-testid': testId }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0
   return (
-    <div className="progress" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+    <div
+      className="progress"
+      role="progressbar"
+      aria-valuenow={Math.round(pct)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      data-testid={testId}
+    >
       <span style={{ width: `${pct}%`, background: `var(--${accent})` }} />
     </div>
   )

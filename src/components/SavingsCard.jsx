@@ -28,7 +28,7 @@ function currentMonthKey() {
 }
 
 export default function SavingsCard() {
-  const { result, year, setYear } = useProfile()
+  const { result, year, activeYear, setYear } = useProfile()
 
   const [amount, setAmount] = useState('')
   const [month, setMonth] = useState(currentMonthKey())
@@ -96,22 +96,8 @@ export default function SavingsCard() {
         </div>
       </div>
 
-      {/* Custom progress bar with testid + aria */}
-      {(() => {
-        const pct = target > 0 ? Math.min(100, (total / target) * 100) : 0
-        return (
-          <div
-            className="progress"
-            role="progressbar"
-            aria-valuenow={Math.round(pct)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            data-testid="savings-progress"
-          >
-            <span style={{ width: `${pct}%`, background: 'var(--gold)' }} />
-          </div>
-        )
-      })()}
+      {/* Progress bar: total / target */}
+      <ProgressBar value={total} max={target} accent="gold" data-testid="savings-progress" />
 
       {entries.length > 0 && (
         <ul className="savings-list">
@@ -134,8 +120,8 @@ export default function SavingsCard() {
               value={month}
               onChange={(e) => setMonth(e.target.value)}
               className="savings-input"
-              min="2026-01"
-              max="2026-12"
+              min={`${activeYear}-01`}
+              max={`${activeYear}-12`}
             />
           </div>
           <div className="field">

@@ -59,7 +59,7 @@ test('renders savings card with target and initial total of zero', async () => {
   expect(screen.getByTestId('savings-progress')).toBeInTheDocument()
 })
 
-test('adding an entry of 200 updates total and shows in list', async () => {
+test('adding an entry of 200 updates total and progress reflects 200/target', async () => {
   render(wrap(<SavingsCard />))
   await waitFor(() => {
     expect(screen.getByTestId('savings-total')).toBeInTheDocument()
@@ -67,6 +67,11 @@ test('adding an entry of 200 updates total and shows in list', async () => {
 
   // The initial total should be 0
   expect(screen.getByTestId('savings-total').textContent).toMatch(/0\.00/)
+
+  // Capture the target value before adding (to compute expected percentage)
+  const targetText = screen.getByTestId('savings-target').textContent
+  // Extract numeric value from RM string (e.g. "RM 1,234.56" → 1234.56)
+  const targetValue = parseFloat(targetText.replace(/[^\d.]/g, ''))
 
   // Add an entry: fill in amount field and click Add
   const amountInput = screen.getByLabelText(/amount/i)
@@ -82,6 +87,13 @@ test('adding an entry of 200 updates total and shows in list', async () => {
   // Total should now reflect 200
   await waitFor(() => {
     expect(screen.getByTestId('savings-total').textContent).toMatch(/200/)
+  })
+
+  // Progress bar aria-valuenow should reflect 200/target percentage
+  await waitFor(() => {
+    const progressBar = screen.getByTestId('savings-progress')
+    const expectedPct = targetValue > 0 ? Math.round((200 / targetValue) * 100) : 0
+    expect(progressBar.getAttribute('aria-valuenow')).toBe(String(expectedPct))
   })
 })
 
