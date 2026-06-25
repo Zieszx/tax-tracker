@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { useProfile } from '../hooks/useProfile.js'
 import StatCard from '../components/StatCard.jsx'
+import SavingsCard from '../components/SavingsCard.jsx'
 import { formatRM, formatPct } from '../engine/format.js'
 
 export default function Dashboard() {
@@ -51,6 +52,10 @@ export default function Dashboard() {
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <SavingsCard />
       </div>
     </div>
   )
