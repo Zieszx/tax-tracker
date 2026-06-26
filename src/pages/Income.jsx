@@ -1,13 +1,14 @@
 /**
- * Income.jsx — Task B1
+ * Income.jsx — Task B4
  *
  * Income page with tabbed layout: Months / Sources / Import.
  *
- * - Months tab: RecordIncomeForm + Month Override Log (table) — B4 replaces the table.
+ * - Months tab: MonthsSummary (sticky) + featured current-month MonthCard +
+ *   .grid-auto-wide of 12 MonthCards + Bulk actions. Old override table removed.
  * - Sources tab: SourceCard grid + projected annual gross.
  * - Import tab: CSV import trigger + ImportCsvModal.
  *
- * Reads:  useProfile() → { year, setYear, result }
+ * Reads:  useProfile() → { year, setYear, result, activeYear }
  * Writes: setYear(updater) for incomeSources and monthOverrides
  */
 
@@ -17,8 +18,15 @@ import { materializeMonths } from '../state/materialize.js'
 import { formatRM } from '../engine/format.js'
 import SourceCard from '../components/SourceCard.jsx'
 import ImportCsvModal from '../components/ImportCsvModal.jsx'
-import RecordIncomeForm, { defaultRecordMonth } from '../components/RecordIncomeForm.jsx'
+import MonthCard from '../components/MonthCard.jsx'
+import MonthsSummary from '../components/MonthsSummary.jsx'
 import Tabs from '../components/Tabs.jsx'
+import {
+  copyMonthToRest,
+  fillProjectedFromAverage,
+  applyMainToAll,
+} from '../state/incomeBulk.js'
+import { defaultRecordMonth } from '../components/RecordIncomeForm.jsx'
 
 let _nextId = Date.now()
 function newId() {
@@ -52,6 +60,12 @@ const INCOME_TABS = [
   { id: 'import', label: 'Import' },
 ]
 
+const BULK_ACTIONS = [
+  { id: 'applyMainToAll', label: 'Set main salary for all months…' },
+  { id: 'copyMonthToRest', label: 'Copy this month to remaining months…' },
+  { id: 'fillProjectedFromAverage', label: 'Fill unconfirmed from average of actuals' },
+]
+
 export default function Income() {
   const ctx = useProfile()
 
@@ -67,23 +81,35 @@ export default function Income() {
   const { year, setYear } = ctx
   const [tab, setTab] = useState('months')
   const [csvModalOpen, setCsvModalOpen] = useState(false)
+
+  // Bulk-action state
+  const [bulkAction, setBulkAction] = useState('')
+  const [bulkAmount, setBulkAmount] = useState('')
+  const [bulkFromMonth, setBulkFromMonth] = useState('')
+  const [bulkConfirmMsg, setBulkConfirmMsg] = useState('')
+
   const sources = year?.incomeSources ?? []
   const overrides = year?.monthOverrides ?? {}
   const taxYear = year?.taxYear ?? 2026
+
   // The current calendar month, only when viewing the current year.
   const thisMonth = new Date().getFullYear() === taxYear ? defaultRecordMonth(taxYear) : null
 
   // Projected months from current sources + overrides
   const months = materializeMonths(sources, overrides, taxYear)
 
-  // Projected annual gross (sum of all materialized months)
+  // Projected (source-only) months — for placeholder values in MonthCards
+  const projectedMonths = materializeMonths(sources, {}, taxYear)
+  const projectedOf = (monthKey) => projectedMonths.find((x) => x.month === monthKey)
+
+  // Projected annual gross
   const annualGross = months.reduce(
     (sum, m) =>
       sum + m.mainSalary + m.partTime.reduce((s, p) => s + (p.amount || 0), 0),
     0
   )
 
-  // ── mutations ────────────────────────────────────────────────────────────────
+  // ── Source mutations ──────────────────────────────────────────────────────
 
   function updateSource(id, updated) {
     setYear((yr) => ({
@@ -107,46 +133,134 @@ export default function Income() {
     }))
   }
 
-  // Override log helpers — main salary and part-time can be overridden
-  // independently per month. An empty input clears just that field; when a
-  // month has no remaining overrides the whole entry is removed.
-  function setOverrideField(monthKey, field, value) {
+  // ── MonthCard mutations ───────────────────────────────────────────────────
+
+  function handleMonthChange(monthKey, patch) {
     setYear((yr) => {
       const existing = yr.monthOverrides[monthKey] ?? {}
-      const next = { ...existing }
-      const blank = value === '' || value == null
-      if (field === 'mainSalary') {
-        if (blank) delete next.mainSalary
-        else next.mainSalary = parseFloat(value) || 0
-      } else if (field === 'partTime') {
-        if (blank) delete next.partTime
-        else next.partTime = [{ date: `${monthKey}-15`, amount: parseFloat(value) || 0, note: 'Manual override' }]
+      let next = { ...existing }
+
+      if (patch.mainSalary !== undefined) {
+        next.mainSalary = patch.mainSalary
       }
-      const nextOverrides = { ...yr.monthOverrides }
-      if (Object.keys(next).length === 0) delete nextOverrides[monthKey]
-      else nextOverrides[monthKey] = next
-      return { ...yr, monthOverrides: nextOverrides }
+      if (patch.partTimeTotal !== undefined) {
+        next.partTime = [
+          { date: `${monthKey}-15`, amount: patch.partTimeTotal, note: 'Manual override' },
+        ]
+      }
+      if (patch.pcb !== undefined) {
+        // PCB is stored in pcbPaid[], not monthOverrides — handle separately below
+      }
+
+      const nextOverrides = { ...yr.monthOverrides, [monthKey]: next }
+
+      // PCB write
+      let nextPcbPaid = yr.pcbPaid ?? []
+      if (patch.pcb !== undefined) {
+        nextPcbPaid = nextPcbPaid.filter((p) => p.month !== monthKey)
+        if (patch.pcb > 0) {
+          nextPcbPaid = [...nextPcbPaid, { month: monthKey, amount: patch.pcb, ref: 'Card' }]
+        }
+      }
+
+      return { ...yr, monthOverrides: nextOverrides, pcbPaid: nextPcbPaid }
     })
   }
 
-  function clearOverride(monthKey) {
+  function handleMonthRecord(monthKey) {
+    setYear((yr) => {
+      const existing = yr.monthOverrides[monthKey] ?? {}
+      // Get effective values from materialization
+      const m = months.find((x) => x.month === monthKey)
+      return {
+        ...yr,
+        monthOverrides: {
+          ...yr.monthOverrides,
+          [monthKey]: {
+            ...existing,
+            mainSalary: existing.mainSalary ?? m?.mainSalary ?? 0,
+            partTime: existing.partTime ?? m?.partTime ?? [],
+            confirmed: true,
+          },
+        },
+      }
+    })
+  }
+
+  function handleMonthClear(monthKey) {
     setYear((yr) => {
       const next = { ...yr.monthOverrides }
       delete next[monthKey]
-      return { ...yr, monthOverrides: next }
+      const pcbPaid = (yr.pcbPaid ?? []).filter((p) => p.month !== monthKey)
+      return { ...yr, monthOverrides: next, pcbPaid }
     })
   }
 
-  // Projected (source-only) months — used for placeholder values in the log
-  const projectedMonths = materializeMonths(sources, {}, taxYear)
-  const projectedOf = (monthKey) => projectedMonths.find((x) => x.month === monthKey)
+  // ── Bulk actions ──────────────────────────────────────────────────────────
+
+  function buildBulkConfirmMsg(action) {
+    if (action === 'applyMainToAll') {
+      const amt = parseFloat(bulkAmount) || 0
+      return `Set main salary to ${formatRM(amt)} for all 12 months?`
+    }
+    if (action === 'copyMonthToRest') {
+      const from = bulkFromMonth || thisMonth || months[0]?.month || ''
+      return `Copy ${from} income to all remaining months?`
+    }
+    if (action === 'fillProjectedFromAverage') {
+      return 'Fill all unconfirmed months with the average of your confirmed actuals?'
+    }
+    return ''
+  }
+
+  function handleBulkSelect(action) {
+    setBulkAction(action)
+    setBulkConfirmMsg('')
+    if (action === 'copyMonthToRest' && !bulkFromMonth) {
+      setBulkFromMonth(thisMonth || months[0]?.month || '')
+    }
+  }
+
+  function handleBulkPreview() {
+    setBulkConfirmMsg(buildBulkConfirmMsg(bulkAction))
+  }
+
+  function handleBulkConfirm() {
+    if (!bulkAction) return
+    setYear((yr) => {
+      let nextOverrides
+      if (bulkAction === 'applyMainToAll') {
+        const amt = parseFloat(bulkAmount) || 0
+        nextOverrides = applyMainToAll(yr, amt)
+      } else if (bulkAction === 'copyMonthToRest') {
+        const from = bulkFromMonth || thisMonth || months[0]?.month || ''
+        nextOverrides = copyMonthToRest(yr, from)
+      } else if (bulkAction === 'fillProjectedFromAverage') {
+        nextOverrides = fillProjectedFromAverage(yr)
+      } else {
+        return yr
+      }
+      return { ...yr, monthOverrides: nextOverrides }
+    })
+    setBulkAction('')
+    setBulkAmount('')
+    setBulkFromMonth('')
+    setBulkConfirmMsg('')
+  }
+
+  function handleBulkCancel() {
+    setBulkAction('')
+    setBulkAmount('')
+    setBulkFromMonth('')
+    setBulkConfirmMsg('')
+  }
 
   return (
     <div>
       <h2 className="page-title">Income</h2>
       <p className="subtitle">
         Record each month's actual income as it happens, or define income sources that
-        project the rest of the year. Override any individual month below.
+        project the rest of the year.
       </p>
 
       {/* ── Tab navigation ─────────────────────────────────────────────────── */}
@@ -160,111 +274,155 @@ export default function Income() {
           aria-labelledby="tab-months"
           className="tab-panel"
         >
-          {/* ── Record income (flexible monthly submission) ─────────────────── */}
-          <RecordIncomeForm />
-
-          {/* ── Projected annual gross (also visible in Months panel) ────────── */}
-          <div className="card income-annual" style={{ marginBottom: 16 }}>
-            <span className="stat-label">Projected annual gross</span>
-            <span className="stat-value income-annual-value">{formatRM(annualGross)}</span>
+          {/* ── Summary bar + mini chart (sticky) ───────────────────────────── */}
+          <div className="months-summary-sticky">
+            <MonthsSummary />
           </div>
 
-          {/* ── Section: Month Override Log ─────────────────────────────────── */}
+          {/* ── Featured current-month card ──────────────────────────────────── */}
+          {thisMonth && (
+            <section className="income-section months-featured-section">
+              <h3 className="income-section-title">This month</h3>
+              <div className="months-featured-card">
+                {(() => {
+                  const m = months.find((x) => x.month === thisMonth)
+                  const pcbEntry = (year?.pcbPaid ?? []).find((p) => p.month === thisMonth)
+                  return (
+                    <MonthCard
+                      monthKey={thisMonth}
+                      projected={projectedOf(thisMonth)}
+                      override={overrides[thisMonth] ?? null}
+                      pcb={pcbEntry?.amount ?? 0}
+                      onChange={(patch) => handleMonthChange(thisMonth, patch)}
+                      onRecord={() => handleMonthRecord(thisMonth)}
+                      onClear={() => handleMonthClear(thisMonth)}
+                      isCurrent={true}
+                    />
+                  )
+                })()}
+              </div>
+            </section>
+          )}
+
+          {/* ── All 12 months grid ───────────────────────────────────────────── */}
           <section className="income-section">
-            <h3 className="income-section-title">Month Override Log</h3>
-            <p className="stat-hint" style={{ marginBottom: 12 }}>
-              The table shows the projected income for each month. Your salary isn't static —
-              edit <strong>Override main</strong> to pin a specific gross (e.g. RM 4,000 one
-              month, RM 4,500 another), and <strong>Override part-time</strong> to set that
-              month's part-time total. Leave a field blank to use the projected value; ✕ clears
-              the whole month.
-            </p>
+            <h3 className="income-section-title">All months</h3>
+            <div className="grid-auto-wide months-grid" aria-label="month cards">
+              {months.map((m) => {
+                const pcbEntry = (year?.pcbPaid ?? []).find((p) => p.month === m.month)
+                return (
+                  <MonthCard
+                    key={m.month}
+                    monthKey={m.month}
+                    projected={projectedOf(m.month)}
+                    override={overrides[m.month] ?? null}
+                    pcb={pcbEntry?.amount ?? 0}
+                    onChange={(patch) => handleMonthChange(m.month, patch)}
+                    onRecord={() => handleMonthRecord(m.month)}
+                    onClear={() => handleMonthClear(m.month)}
+                    isCurrent={m.month === thisMonth}
+                  />
+                )
+              })}
+            </div>
+          </section>
 
-            <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
-              <table className="override-table">
-                <thead>
-                  <tr>
-                    <th>Month</th>
-                    <th>Status</th>
-                    <th>Projected main (RM)</th>
-                    <th>Override main (RM)</th>
-                    <th>Projected part-time (RM)</th>
-                    <th>Override part-time (RM)</th>
-                    <th>Month total (RM)</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {months.map((m) => {
-                    const mainOverridden = overrides[m.month]?.mainSalary !== undefined
-                    const partOverridden = overrides[m.month]?.partTime !== undefined
-                    const isActual = overrides[m.month]?.confirmed === true
-                    const hasOverride = mainOverridden || partOverridden
-                    const isCurrent = m.month === thisMonth
-                    const ptTotal = m.partTime.reduce((s, p) => s + (p.amount || 0), 0)
+          {/* ── Bulk actions panel ────────────────────────────────────────────── */}
+          <section className="income-section bulk-actions-section">
+            <h3 className="income-section-title">Bulk actions</h3>
+            <div className="card bulk-actions-card">
+              <div className="bulk-actions-row">
+                {BULK_ACTIONS.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    className={`btn btn-ghost bulk-action-btn${bulkAction === a.id ? ' bulk-action-btn-active' : ''}`}
+                    aria-label={a.label}
+                    onClick={() => handleBulkSelect(a.id)}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+              </div>
 
-                    const proj = projectedOf(m.month)
-                    const projectedMain = proj?.mainSalary ?? 0
-                    const projectedPart = (proj?.partTime ?? []).reduce(
-                      (s, p) => s + (p.amount || 0),
-                      0
-                    )
+              {/* Inputs for parameterised actions */}
+              {bulkAction === 'applyMainToAll' && (
+                <div className="bulk-action-inputs">
+                  <label className="field bulk-action-field">
+                    <span>Main salary amount (RM)</span>
+                    <input
+                      type="number"
+                      aria-label="bulk main salary amount"
+                      value={bulkAmount}
+                      min="0"
+                      step="100"
+                      placeholder="e.g. 4500"
+                      onChange={(e) => setBulkAmount(e.target.value)}
+                    />
+                  </label>
+                </div>
+              )}
 
-                    return (
-                      <tr key={m.month} className={`override-row${isCurrent ? ' is-current' : ''}`}>
-                        <td>
-                          {m.month}
-                          {isCurrent && <span className="current-tag">this month</span>}
-                        </td>
-                        <td>
-                          <span className={`override-status ${isActual ? 'is-actual' : 'is-projected'}`}>
-                            {isActual ? 'Actual' : 'Projected'}
-                          </span>
-                        </td>
-                        <td className="override-projected">{formatRM(projectedMain)}</td>
-                        <td>
-                          <input
-                            type="number"
-                            aria-label={`override main salary ${m.month}`}
-                            className="override-input"
-                            value={mainOverridden ? m.mainSalary : ''}
-                            placeholder={formatRM(projectedMain)}
-                            onChange={(e) => setOverrideField(m.month, 'mainSalary', e.target.value)}
-                            min="0"
-                            step="100"
-                          />
-                        </td>
-                        <td className="override-projected">{formatRM(projectedPart)}</td>
-                        <td>
-                          <input
-                            type="number"
-                            aria-label={`override part-time ${m.month}`}
-                            className="override-input"
-                            value={partOverridden ? ptTotal : ''}
-                            placeholder={formatRM(projectedPart)}
-                            onChange={(e) => setOverrideField(m.month, 'partTime', e.target.value)}
-                            min="0"
-                            step="50"
-                          />
-                        </td>
-                        <td>{formatRM(m.mainSalary + ptTotal)}</td>
-                        <td>
-                          {hasOverride && (
-                            <button
-                              className="override-clear-btn"
-                              aria-label={`clear override ${m.month}`}
-                              onClick={() => clearOverride(m.month)}
-                              title="Clear month overrides"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+              {bulkAction === 'copyMonthToRest' && (
+                <div className="bulk-action-inputs">
+                  <label className="field bulk-action-field">
+                    <span>Copy from month</span>
+                    <select
+                      aria-label="bulk copy from month"
+                      value={bulkFromMonth}
+                      onChange={(e) => setBulkFromMonth(e.target.value)}
+                    >
+                      {months.map((m) => (
+                        <option key={m.month} value={m.month}>{m.month}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              )}
+
+              {/* Confirm / cancel row */}
+              {bulkAction && !bulkConfirmMsg && (
+                <div className="bulk-action-confirm-row">
+                  <button
+                    type="button"
+                    className="btn btn-gold"
+                    aria-label="preview bulk action"
+                    onClick={handleBulkPreview}
+                  >
+                    Preview
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    aria-label="cancel bulk action"
+                    onClick={handleBulkCancel}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+
+              {bulkConfirmMsg && (
+                <div className="bulk-action-confirm-row">
+                  <p className="bulk-action-confirm-msg" aria-live="polite">{bulkConfirmMsg}</p>
+                  <button
+                    type="button"
+                    className="btn btn-gold"
+                    aria-label="confirm bulk action"
+                    onClick={handleBulkConfirm}
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    aria-label="cancel bulk action"
+                    onClick={handleBulkCancel}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         </div>

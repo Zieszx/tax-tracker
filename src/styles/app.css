@@ -994,3 +994,50 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .month-card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .month-card-record-btn { font-size: 12px; padding: 7px 12px; }
 .month-card-clear-btn { font-size: 12px; padding: 7px 12px; }
+
+/* ── MonthsSummary (Task B4) ─────────────────────────────────────────────── */
+.months-summary { background: var(--surface); border: 2.5px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; }
+.months-summary-sticky { position: sticky; top: 0; z-index: 10; background: var(--paper); padding: 8px 0; margin-bottom: 4px; }
+.months-summary-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.months-summary-stat { display: flex; flex-direction: column; gap: 2px; flex: 1 1 140px; }
+.months-summary-gross { font-size: 22px !important; }
+.months-summary-actuals { font-size: 22px; font-weight: 800; color: var(--ink); }
+.months-summary-actuals-n { color: var(--gold); }
+.months-summary-actuals-sep { color: var(--muted); margin: 0 2px; }
+.months-summary-actuals-denom { color: var(--muted); }
+.months-summary-tax { font-size: 22px; font-weight: 800; color: var(--pink); }
+.months-summary-chart { width: 100%; }
+
+/* MonthsSummary chart tooltip */
+.months-chart-tooltip { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 2px 2px 0 var(--border); }
+.months-chart-tooltip-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.months-chart-tooltip-row { display: flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 600; }
+.months-chart-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.months-chart-dot-main { background: var(--gold); }
+.months-chart-dot-part { background: var(--pink); }
+
+/* Featured current-month MonthCard */
+.months-featured-section { margin-bottom: 28px; }
+.months-featured-card { max-width: 480px; }
+.months-featured-card .card { border-width: 3px; box-shadow: 4px 4px 0 var(--gold); }
+.months-featured-card .month-card-input { font-size: 15px; }
+.months-featured-card .month-card-total-value { font-size: 22px; }
+
+/* All-months grid */
+.months-grid { margin-top: 12px; }
+
+/* ── Bulk actions panel (Task B4) ────────────────────────────────────────── */
+.bulk-actions-section { margin-top: 32px; }
+.bulk-actions-card { display: flex; flex-direction: column; gap: 12px; }
+.bulk-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.bulk-action-btn { font-size: 12px; padding: 7px 12px; white-space: nowrap; }
+.bulk-action-btn-active { border-color: var(--gold); color: var(--gold); }
+.bulk-action-inputs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.bulk-action-field { min-width: 200px; }
+.bulk-action-field input, .bulk-action-field select { background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 10px; color: var(--ink); font-size: 14px; font-weight: 600; min-width: 160px; }
+.bulk-action-confirm-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bulk-action-confirm-msg { font-size: 13px; font-weight: 600; color: var(--ink); margin: 0; flex: 1 1 200px; }
+@media (max-width: 480px) {
+  .bulk-actions-row { flex-direction: column; }
+  .months-summary-stats { gap: 10px; }
+}
