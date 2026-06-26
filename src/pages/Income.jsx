@@ -1,8 +1,11 @@
 /**
- * Income.jsx — Task 3.1
+ * Income.jsx — Task B1
  *
- * Income page: side-by-side source cards (2-col ≥768px / 1-col below)
- * + month-override log using materializeMonths.
+ * Income page with tabbed layout: Months / Sources / Import.
+ *
+ * - Months tab: RecordIncomeForm + Month Override Log (table) — B4 replaces the table.
+ * - Sources tab: SourceCard grid + projected annual gross.
+ * - Import tab: CSV import trigger + ImportCsvModal.
  *
  * Reads:  useProfile() → { year, setYear, result }
  * Writes: setYear(updater) for incomeSources and monthOverrides
@@ -15,6 +18,7 @@ import { formatRM } from '../engine/format.js'
 import SourceCard from '../components/SourceCard.jsx'
 import ImportCsvModal from '../components/ImportCsvModal.jsx'
 import RecordIncomeForm, { defaultRecordMonth } from '../components/RecordIncomeForm.jsx'
+import Tabs from '../components/Tabs.jsx'
 
 let _nextId = Date.now()
 function newId() {
@@ -42,6 +46,12 @@ function blankSource(type = 'part') {
       }
 }
 
+const INCOME_TABS = [
+  { id: 'months', label: 'Months' },
+  { id: 'sources', label: 'Sources' },
+  { id: 'import', label: 'Import' },
+]
+
 export default function Income() {
   const ctx = useProfile()
 
@@ -55,6 +65,7 @@ export default function Income() {
   }
 
   const { year, setYear } = ctx
+  const [tab, setTab] = useState('months')
   const [csvModalOpen, setCsvModalOpen] = useState(false)
   const sources = year?.incomeSources ?? []
   const overrides = year?.monthOverrides ?? {}
@@ -138,161 +149,210 @@ export default function Income() {
         project the rest of the year. Override any individual month below.
       </p>
 
-      {/* ── Record income (flexible monthly submission) ───────────────────── */}
-      <RecordIncomeForm />
+      {/* ── Tab navigation ─────────────────────────────────────────────────── */}
+      <Tabs tabs={INCOME_TABS} active={tab} onChange={setTab} />
 
-      {/* ── Section: Income Sources ───────────────────────────────────────── */}
-      <section className="income-section">
-        <div className="income-section-header">
-          <h3 className="income-section-title">Income Sources</h3>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              className="btn btn-ghost"
-              onClick={() => setCsvModalOpen(true)}
-              aria-label="import bank CSV"
-            >
-              ↑ Import CSV
-            </button>
-            <button
-              className="btn btn-gold"
-              onClick={addSource}
-              aria-label="add part-time source"
-            >
-              + Add Source
-            </button>
+      {/* ── Months panel ───────────────────────────────────────────────────── */}
+      {tab === 'months' && (
+        <div
+          role="tabpanel"
+          id="panel-months"
+          aria-labelledby="tab-months"
+          className="tab-panel"
+        >
+          {/* ── Record income (flexible monthly submission) ─────────────────── */}
+          <RecordIncomeForm />
+
+          {/* ── Projected annual gross (also visible in Months panel) ────────── */}
+          <div className="card income-annual" style={{ marginBottom: 16 }}>
+            <span className="stat-label">Projected annual gross</span>
+            <span className="stat-value income-annual-value">{formatRM(annualGross)}</span>
+          </div>
+
+          {/* ── Section: Month Override Log ─────────────────────────────────── */}
+          <section className="income-section">
+            <h3 className="income-section-title">Month Override Log</h3>
+            <p className="stat-hint" style={{ marginBottom: 12 }}>
+              The table shows the projected income for each month. Your salary isn't static —
+              edit <strong>Override main</strong> to pin a specific gross (e.g. RM 4,000 one
+              month, RM 4,500 another), and <strong>Override part-time</strong> to set that
+              month's part-time total. Leave a field blank to use the projected value; ✕ clears
+              the whole month.
+            </p>
+
+            <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
+              <table className="override-table">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Status</th>
+                    <th>Projected main (RM)</th>
+                    <th>Override main (RM)</th>
+                    <th>Projected part-time (RM)</th>
+                    <th>Override part-time (RM)</th>
+                    <th>Month total (RM)</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {months.map((m) => {
+                    const mainOverridden = overrides[m.month]?.mainSalary !== undefined
+                    const partOverridden = overrides[m.month]?.partTime !== undefined
+                    const isActual = overrides[m.month]?.confirmed === true
+                    const hasOverride = mainOverridden || partOverridden
+                    const isCurrent = m.month === thisMonth
+                    const ptTotal = m.partTime.reduce((s, p) => s + (p.amount || 0), 0)
+
+                    const proj = projectedOf(m.month)
+                    const projectedMain = proj?.mainSalary ?? 0
+                    const projectedPart = (proj?.partTime ?? []).reduce(
+                      (s, p) => s + (p.amount || 0),
+                      0
+                    )
+
+                    return (
+                      <tr key={m.month} className={`override-row${isCurrent ? ' is-current' : ''}`}>
+                        <td>
+                          {m.month}
+                          {isCurrent && <span className="current-tag">this month</span>}
+                        </td>
+                        <td>
+                          <span className={`override-status ${isActual ? 'is-actual' : 'is-projected'}`}>
+                            {isActual ? 'Actual' : 'Projected'}
+                          </span>
+                        </td>
+                        <td className="override-projected">{formatRM(projectedMain)}</td>
+                        <td>
+                          <input
+                            type="number"
+                            aria-label={`override main salary ${m.month}`}
+                            className="override-input"
+                            value={mainOverridden ? m.mainSalary : ''}
+                            placeholder={formatRM(projectedMain)}
+                            onChange={(e) => setOverrideField(m.month, 'mainSalary', e.target.value)}
+                            min="0"
+                            step="100"
+                          />
+                        </td>
+                        <td className="override-projected">{formatRM(projectedPart)}</td>
+                        <td>
+                          <input
+                            type="number"
+                            aria-label={`override part-time ${m.month}`}
+                            className="override-input"
+                            value={partOverridden ? ptTotal : ''}
+                            placeholder={formatRM(projectedPart)}
+                            onChange={(e) => setOverrideField(m.month, 'partTime', e.target.value)}
+                            min="0"
+                            step="50"
+                          />
+                        </td>
+                        <td>{formatRM(m.mainSalary + ptTotal)}</td>
+                        <td>
+                          {hasOverride && (
+                            <button
+                              className="override-clear-btn"
+                              aria-label={`clear override ${m.month}`}
+                              onClick={() => clearOverride(m.month)}
+                              title="Clear month overrides"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* ── Sources panel ──────────────────────────────────────────────────── */}
+      {tab === 'sources' && (
+        <div
+          role="tabpanel"
+          id="panel-sources"
+          aria-labelledby="tab-sources"
+          className="tab-panel"
+        >
+          <section className="income-section">
+            <div className="income-section-header">
+              <h3 className="income-section-title">Income Sources</h3>
+              <button
+                className="btn btn-gold"
+                onClick={addSource}
+                aria-label="add part-time source"
+              >
+                + Add Source
+              </button>
+            </div>
+
+            {sources.length === 0 ? (
+              <div className="card income-empty">
+                <p>No income sources yet. Add one to start projecting.</p>
+              </div>
+            ) : (
+              <div className="sources-grid">
+                {sources.map((src) => (
+                  <SourceCard
+                    key={src.id}
+                    source={src}
+                    onChange={(updated) => updateSource(src.id, updated)}
+                    onRemove={() => removeSource(src.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* ── Projected annual gross ──────────────────────────────────────── */}
+          <div className="card income-annual" style={{ marginTop: 16, marginBottom: 24 }}>
+            <span className="stat-label">Projected annual gross</span>
+            <span className="stat-value income-annual-value">{formatRM(annualGross)}</span>
           </div>
         </div>
+      )}
 
-        {sources.length === 0 ? (
-          <div className="card income-empty">
-            <p>No income sources yet. Add one to start projecting.</p>
-          </div>
-        ) : (
-          <div className="sources-grid">
-            {sources.map((src) => (
-              <SourceCard
-                key={src.id}
-                source={src}
-                onChange={(updated) => updateSource(src.id, updated)}
-                onRemove={() => removeSource(src.id)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* ── Import panel ───────────────────────────────────────────────────── */}
+      {tab === 'import' && (
+        <div
+          role="tabpanel"
+          id="panel-import"
+          aria-labelledby="tab-import"
+          className="tab-panel"
+        >
+          <section className="income-section">
+            <div className="income-section-header">
+              <h3 className="income-section-title">Import Bank CSV</h3>
+            </div>
+            <div className="card income-empty">
+              <p style={{ marginBottom: 16 }}>
+                Import a bank CSV to auto-fill your month overrides. The importer
+                reads common Malaysian bank statement formats and maps transactions
+                to the correct months.
+              </p>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setCsvModalOpen(true)}
+                aria-label="import bank CSV"
+              >
+                ↑ Import CSV
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
-      {/* ── Projected annual gross ────────────────────────────────────────── */}
-      <div className="card income-annual" style={{ marginTop: 16, marginBottom: 24 }}>
-        <span className="stat-label">Projected annual gross</span>
-        <span className="stat-value income-annual-value">{formatRM(annualGross)}</span>
-      </div>
-
-      {/* ── CSV Import Modal ─────────────────────────────────────────────── */}
+      {/* ── CSV Import Modal (always mounted so it can close from any tab) ── */}
       <ImportCsvModal
         open={csvModalOpen}
         onClose={() => setCsvModalOpen(false)}
         setYear={setYear}
         year={year}
       />
-
-      {/* ── Section: Month Override Log ───────────────────────────────────── */}
-      <section className="income-section">
-        <h3 className="income-section-title">Month Override Log</h3>
-        <p className="stat-hint" style={{ marginBottom: 12 }}>
-          The table shows the projected income for each month. Your salary isn't static —
-          edit <strong>Override main</strong> to pin a specific gross (e.g. RM 4,000 one
-          month, RM 4,500 another), and <strong>Override part-time</strong> to set that
-          month's part-time total. Leave a field blank to use the projected value; ✕ clears
-          the whole month.
-        </p>
-
-        <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
-          <table className="override-table">
-            <thead>
-              <tr>
-                <th>Month</th>
-                <th>Status</th>
-                <th>Projected main (RM)</th>
-                <th>Override main (RM)</th>
-                <th>Projected part-time (RM)</th>
-                <th>Override part-time (RM)</th>
-                <th>Month total (RM)</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {months.map((m) => {
-                const mainOverridden = overrides[m.month]?.mainSalary !== undefined
-                const partOverridden = overrides[m.month]?.partTime !== undefined
-                const isActual = overrides[m.month]?.confirmed === true
-                const hasOverride = mainOverridden || partOverridden
-                const isCurrent = m.month === thisMonth
-                const ptTotal = m.partTime.reduce((s, p) => s + (p.amount || 0), 0)
-
-                const proj = projectedOf(m.month)
-                const projectedMain = proj?.mainSalary ?? 0
-                const projectedPart = (proj?.partTime ?? []).reduce(
-                  (s, p) => s + (p.amount || 0),
-                  0
-                )
-
-                return (
-                  <tr key={m.month} className={`override-row${isCurrent ? ' is-current' : ''}`}>
-                    <td>
-                      {m.month}
-                      {isCurrent && <span className="current-tag">this month</span>}
-                    </td>
-                    <td>
-                      <span className={`override-status ${isActual ? 'is-actual' : 'is-projected'}`}>
-                        {isActual ? 'Actual' : 'Projected'}
-                      </span>
-                    </td>
-                    <td className="override-projected">{formatRM(projectedMain)}</td>
-                    <td>
-                      <input
-                        type="number"
-                        aria-label={`override main salary ${m.month}`}
-                        className="override-input"
-                        value={mainOverridden ? m.mainSalary : ''}
-                        placeholder={formatRM(projectedMain)}
-                        onChange={(e) => setOverrideField(m.month, 'mainSalary', e.target.value)}
-                        min="0"
-                        step="100"
-                      />
-                    </td>
-                    <td className="override-projected">{formatRM(projectedPart)}</td>
-                    <td>
-                      <input
-                        type="number"
-                        aria-label={`override part-time ${m.month}`}
-                        className="override-input"
-                        value={partOverridden ? ptTotal : ''}
-                        placeholder={formatRM(projectedPart)}
-                        onChange={(e) => setOverrideField(m.month, 'partTime', e.target.value)}
-                        min="0"
-                        step="50"
-                      />
-                    </td>
-                    <td>{formatRM(m.mainSalary + ptTotal)}</td>
-                    <td>
-                      {hasOverride && (
-                        <button
-                          className="override-clear-btn"
-                          aria-label={`clear override ${m.month}`}
-                          onClick={() => clearOverride(m.month)}
-                          title="Clear month overrides"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   )
 }

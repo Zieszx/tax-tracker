@@ -1,8 +1,9 @@
 /**
- * Income.test.jsx — Task 3.1: SourceCard + Income page
+ * Income.test.jsx — Task B1 update
  *
- * TDD: written BEFORE the implementation to drive the design.
- * Tests the new Income page (side-by-side source cards + override log).
+ * Tests for the tabbed Income page.
+ * Sources-related assertions switch to the Sources tab first.
+ * Months/override assertions use the default Months tab.
  */
 
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
@@ -70,13 +71,21 @@ function wrap(ui, data = seededData) {
   )
 }
 
+/** Helper: switch to the Sources tab */
+async function switchToSources() {
+  const sourcesTab = screen.getByRole('tab', { name: /sources/i })
+  await act(async () => { fireEvent.click(sourcesTab) })
+}
+
 test('renders existing source cards (Main + Nuvera) from migrated data', async () => {
   render(wrap(<Income />))
-  // Wait for vault to unlock and cards to appear
+  // Wait for vault to unlock
   await waitFor(() => {
-    // page title "Income" must be there
     expect(screen.getByRole('heading', { level: 2, name: /^income$/i })).toBeInTheDocument()
   })
+
+  // Switch to Sources tab to see the source cards
+  await switchToSources()
 
   // migrateV1 seeds two sources: "Main employer" and "Nuvera"
   await waitFor(() => {
@@ -91,6 +100,9 @@ test('sources grid container has responsive class', async () => {
     expect(screen.getByRole('heading', { level: 2, name: /^income$/i })).toBeInTheDocument()
   })
 
+  // Switch to Sources tab to see the sources grid
+  await switchToSources()
+
   // The sources grid should carry the class that enables 2-col layout
   await waitFor(() => {
     const grid = document.querySelector('.sources-grid')
@@ -100,6 +112,13 @@ test('sources grid container has responsive class', async () => {
 
 test('add a new part-time source adds a third card', async () => {
   render(wrap(<Income />))
+  await waitFor(() =>
+    expect(screen.getByRole('heading', { level: 2, name: /^income$/i })).toBeInTheDocument()
+  )
+
+  // Switch to Sources tab
+  await switchToSources()
+
   await waitFor(() =>
     expect(screen.getByDisplayValue(/Main employer/i)).toBeInTheDocument()
   )
@@ -122,6 +141,13 @@ test('add a new part-time source adds a third card', async () => {
 test('editing main monthlyGross updates projected annual gross value', async () => {
   // Use projectionData: single main source, NO month overrides — so source projection drives annualGross
   render(wrap(<Income />, projectionData))
+
+  // Switch to Sources tab where the source card and annual gross are displayed
+  await waitFor(() => {
+    expect(screen.getByRole('heading', { level: 2, name: /^income$/i })).toBeInTheDocument()
+  })
+  await switchToSources()
+
   await waitFor(() =>
     expect(screen.getByDisplayValue(/Test Corp/i)).toBeInTheDocument()
   )
@@ -152,10 +178,12 @@ test('editing main monthlyGross updates projected annual gross value', async () 
 
 test('overriding a month part-time updates projected annual gross', async () => {
   // projectionData: single main source (3000/mo = 36,000), no part-time
+  // Override input is in Months tab (default); annual gross is also shown in Months tab
   render(wrap(<Income />, projectionData))
   await waitFor(() =>
-    expect(screen.getByDisplayValue(/Test Corp/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: /^income$/i })).toBeInTheDocument()
   )
+  // Months tab is default — check annual gross shown there
   await waitFor(() => {
     expect(document.querySelector('.income-annual-value').textContent).toMatch(/36,000/)
   })
@@ -186,6 +214,7 @@ test('override log shows Actual/Projected status (confirmed month → Actual)', 
     },
   }
   render(wrap(<Income />, withActual))
+  // Months tab is default — override log is there
   await waitFor(() =>
     expect(screen.getByText(/month override log/i)).toBeInTheDocument()
   )
@@ -198,6 +227,7 @@ test('override log shows Actual/Projected status (confirmed month → Actual)', 
 
 test('override log shows materialized months (12 rows)', async () => {
   render(wrap(<Income />))
+  // Months tab is default — override log is there
   await waitFor(() =>
     expect(screen.getByText(/month override log/i)).toBeInTheDocument()
   )

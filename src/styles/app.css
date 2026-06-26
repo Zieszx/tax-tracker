@@ -166,6 +166,14 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
   .year-add-label { display: none; }
 }
 
+/* ── Tabs component (Task B1) ────────────────────────────────────────────── */
+.tabs-bar { display: flex; gap: 4px; margin-bottom: 20px; padding: 4px; background: var(--paper); border: 2px solid var(--border); border-radius: 14px; }
+.tabs-btn { flex: 1; background: transparent; border: 2px solid transparent; border-radius: 10px; padding: 9px 16px; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; transition: background .15s, color .15s, border-color .15s; white-space: nowrap; }
+.tabs-btn:hover { background: var(--surface); color: var(--ink); }
+.tabs-btn-active { background: var(--surface); color: var(--ink); border-color: var(--border); box-shadow: 2px 2px 0 var(--border); }
+.tab-panel { outline: none; }
+@media (max-width: 480px) { .tabs-btn { padding: 8px 8px; font-size: 12px; } }
+
 /* ── Income page (Task 3.1) ─────────────────────────────────────────────── */
 .income-section { margin-bottom: 28px; }
 .income-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
