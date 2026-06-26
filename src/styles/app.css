@@ -98,6 +98,11 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .relief-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .relief-hint { margin-top: 10px; font-size: 13px; color: var(--pink); }
 
+/* ── Tax Calc side-by-side (Task A4) ─────────────────────────────────────── */
+.taxcalc-split { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 1024px) { .taxcalc-split { grid-template-columns: 1.3fr 1fr; align-items: start; } }
+.taxcalc-scenarios { display: flex; flex-direction: column; gap: 0; }
+
 .tax-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; min-width: 320px; }
 .tax-table th, .tax-table td { text-align: right; padding: 8px; border-bottom: 1px solid var(--border); }
 .tax-table th:first-child, .tax-table td:first-child { text-align: left; }
