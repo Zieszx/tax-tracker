@@ -28,34 +28,36 @@ export default function Reliefs() {
       <h2 className="page-title">Reliefs</h2>
       <p className="subtitle">Maximise your reliefs to lower chargeable income.</p>
 
-      {profile.reliefs.map((r) => {
-        const saving = savingIfMaxed(r)
-        const pct = r.limit > 0 ? Math.min(100, (r.amount / r.limit) * 100) : 0
-        return (
-          <div className="card relief" key={r.key}>
-            <div className="relief-head">
-              <strong style={{ fontWeight: 800 }}>{r.label}</strong>
-              <span className="stat-hint">
-                limit {formatRM(r.limit)}
-                {pct >= 100 && <span style={{ marginLeft: 6, color: 'var(--positive)', fontWeight: 700 }}>✓ maxed</span>}
-              </span>
-            </div>
-            <label className="field">
-              <span>Amount claimed</span>
-              <input type="number" aria-label={`${r.label} amount`}
-                value={r.amount} disabled={r.auto}
-                onChange={(e) => setAmount(r.key, e.target.value)} />
-            </label>
-            <ProgressBar value={r.amount} max={r.limit}
-              accent={r.amount >= r.limit ? 'positive' : 'gold'} />
-            {saving > 0.5 && (
-              <div className="relief-hint">
-                💡 Top up to {formatRM(r.limit)} → save about {formatRM(saving)} in tax.
+      <div className="grid-auto-wide" style={{ alignItems: 'start' }}>
+        {profile.reliefs.map((r) => {
+          const saving = savingIfMaxed(r)
+          const pct = r.limit > 0 ? Math.min(100, (r.amount / r.limit) * 100) : 0
+          return (
+            <div className="card relief" key={r.key}>
+              <div className="relief-head">
+                <strong style={{ fontWeight: 800 }}>{r.label}</strong>
+                <span className="stat-hint">
+                  limit {formatRM(r.limit)}
+                  {pct >= 100 && <span style={{ marginLeft: 6, color: 'var(--positive)', fontWeight: 700 }}>✓ maxed</span>}
+                </span>
               </div>
-            )}
-          </div>
-        )
-      })}
+              <label className="field">
+                <span>Amount claimed</span>
+                <input type="number" aria-label={`${r.label} amount`}
+                  value={r.amount} disabled={r.auto}
+                  onChange={(e) => setAmount(r.key, e.target.value)} />
+              </label>
+              <ProgressBar value={r.amount} max={r.limit}
+                accent={r.amount >= r.limit ? 'positive' : 'gold'} />
+              {saving > 0.5 && (
+                <div className="relief-hint">
+                  💡 Top up to {formatRM(r.limit)} → save about {formatRM(saving)} in tax.
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       <div className="card" style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span className="stat-label">Total reliefs</span>
