@@ -98,6 +98,11 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .relief-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .relief-hint { margin-top: 10px; font-size: 13px; color: var(--pink); }
 
+/* ── BE Guide layout (Task A5) ───────────────────────────────────────────── */
+.guide-prose { max-width: 72ch; }
+.guide-split { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 1024px) { .guide-split { grid-template-columns: 1fr 1fr; align-items: start; } }
+
 /* ── Tax Calc side-by-side (Task A4) ─────────────────────────────────────── */
 .taxcalc-split { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 1024px) { .taxcalc-split { grid-template-columns: 1.3fr 1fr; align-items: start; } }

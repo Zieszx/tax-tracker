@@ -33,7 +33,7 @@ export default function BorangGuide() {
   return (
     <div>
       <h2 className="page-title">Borang BE e-Filing Guide</h2>
-      <p className="subtitle">
+      <p className="subtitle guide-prose">
         Step-by-step guide for resident individuals without business income.
         Deadline: <strong>30 April 2027</strong> ·{' '}
         <a href="https://mytax.hasil.gov.my" target="_blank" rel="noopener noreferrer">
@@ -42,7 +42,7 @@ export default function BorangGuide() {
       </p>
 
       {/* ── Section 1: Before you start ──────────────────────────────────── */}
-      <section className="card" aria-labelledby="bys-heading">
+      <section className="card guide-prose" aria-labelledby="bys-heading">
         <h3 className="settings-heading" id="bys-heading">Before you start</h3>
 
         <h4 className="be-subheading">Who files Borang BE?</h4>
@@ -94,8 +94,11 @@ export default function BorangGuide() {
         </ul>
       </section>
 
+      {/* ── Sections 2 + 7: field-mapping + checklist side-by-side ─────────── */}
+      <div className="guide-split" style={{ marginTop: 16 }}>
+
       {/* ── Section 2: Step-by-step e-Filing ─────────────────────────────── */}
-      <section className="card" style={{ marginTop: 16 }} aria-labelledby="steps-heading">
+      <section className="card" aria-labelledby="steps-heading">
         <h3 className="settings-heading" id="steps-heading">Step-by-step e-Filing</h3>
 
         <ol className="be-steps">
@@ -225,8 +228,26 @@ export default function BorangGuide() {
         </ol>
       </section>
 
+      {/* ── Section 7: Before-you-file checklist (right col in guide-split) ── */}
+      <section className="card" aria-labelledby="checklist-heading">
+        <h3 className="settings-heading" id="checklist-heading">Before-you-file checklist</h3>
+        <ul className="be-checklist">
+          <li>EA form(s) received and verified against MyTax PCB ledger</li>
+          <li>Part-time payment records collated for all months</li>
+          <li>Lifestyle relief receipts gathered (WiFi, books, sports equipment, electronics)</li>
+          <li>Medical / dental receipts collected</li>
+          <li>Insurance premium certificate obtained from insurer</li>
+          <li>SSPN net deposit confirmed (consider topping up before 31 Dec 2026 — up to RM8,000 relief)</li>
+          <li>Consider a medical checkup before 31 Dec 2026 (up to RM1,000 relief within the medical limit)</li>
+          <li>Bank account in MyTax profile is up-to-date (essential for refunds)</li>
+          <li>MyTax e-Filing password is active and accessible</li>
+        </ul>
+      </section>
+
+      </div>{/* end guide-split */}
+
       {/* ── Section 3: Payment ───────────────────────────────────────────── */}
-      <section className="card" style={{ marginTop: 16 }} aria-labelledby="payment-heading">
+      <section className="card guide-prose" style={{ marginTop: 16 }} aria-labelledby="payment-heading">
         <h3 className="settings-heading" id="payment-heading">Payment</h3>
 
         <p className="be-body">
@@ -254,7 +275,7 @@ export default function BorangGuide() {
       </section>
 
       {/* ── Section 4: Special notes ─────────────────────────────────────── */}
-      <section className="card" style={{ marginTop: 16 }} aria-labelledby="notes-heading">
+      <section className="card guide-prose" style={{ marginTop: 16 }} aria-labelledby="notes-heading">
         <h3 className="settings-heading" id="notes-heading">Special notes</h3>
 
         <div className="be-note-card">
@@ -280,7 +301,7 @@ export default function BorangGuide() {
       </section>
 
       {/* ── Section 5: Deadlines & penalties ────────────────────────────── */}
-      <section className="card" style={{ marginTop: 16 }} aria-labelledby="deadlines-heading">
+      <section className="card guide-prose" style={{ marginTop: 16 }} aria-labelledby="deadlines-heading">
         <h3 className="settings-heading" id="deadlines-heading">Deadlines &amp; penalties</h3>
 
         <table className="be-table" aria-label="Filing deadlines">
@@ -332,7 +353,7 @@ export default function BorangGuide() {
       </section>
 
       {/* ── Section 6: After filing ──────────────────────────────────────── */}
-      <section className="card" style={{ marginTop: 16 }} aria-labelledby="after-heading">
+      <section className="card guide-prose" style={{ marginTop: 16 }} aria-labelledby="after-heading">
         <h3 className="settings-heading" id="after-heading">After filing</h3>
 
         <h4 className="be-subheading">Check submission status</h4>
@@ -353,22 +374,6 @@ export default function BorangGuide() {
           Retain all supporting documents (EA form, receipts, bank statements) for at least
           <strong> 7 years</strong> in case of an audit or review.
         </p>
-      </section>
-
-      {/* ── Section 7: Before-you-file checklist ────────────────────────── */}
-      <section className="card" style={{ marginTop: 16 }} aria-labelledby="checklist-heading">
-        <h3 className="settings-heading" id="checklist-heading">Before-you-file checklist</h3>
-        <ul className="be-checklist">
-          <li>EA form(s) received and verified against MyTax PCB ledger</li>
-          <li>Part-time payment records collated for all months</li>
-          <li>Lifestyle relief receipts gathered (WiFi, books, sports equipment, electronics)</li>
-          <li>Medical / dental receipts collected</li>
-          <li>Insurance premium certificate obtained from insurer</li>
-          <li>SSPN net deposit confirmed (consider topping up before 31 Dec 2026 — up to RM8,000 relief)</li>
-          <li>Consider a medical checkup before 31 Dec 2026 (up to RM1,000 relief within the medical limit)</li>
-          <li>Bank account in MyTax profile is up-to-date (essential for refunds)</li>
-          <li>MyTax e-Filing password is active and accessible</li>
-        </ul>
       </section>
 
       {/* ── Link to Settings for data management ───────────────────────── */}
