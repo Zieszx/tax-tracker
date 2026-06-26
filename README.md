@@ -155,9 +155,9 @@ src/
   hooks/       useLocalStorage.js, useProfile.js (active-year vault adapter)
   components/  Nav, Button, Card, StatCard, ProgressBar, ThemeToggle, LockButton,
                SourceCard, YearSwitcher, SavingsCard, ImportCsvModal, PrintSummary, Footer,
-               Tabs, MonthCard, MonthsSummary, RecordIncomeForm
+               Tabs, MonthCard, MonthsSummary
   pages/       Lock, Onboarding, Dashboard, Income, Reliefs, TaxCalc, BorangGuide, Settings
-  state/       appData.js, materialize.js, incomeBulk.js (pure bulk-action helpers)
+  state/       appData.js, materialize.js, incomeBulk.js (bulk helpers), currentMonth.js
   styles/      theme.css (Neo-Lux tokens), app.css, print.css
 public/
   pwa-192.png  solid-gold PWA icon (192×192)

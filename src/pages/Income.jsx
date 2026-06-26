@@ -26,7 +26,7 @@ import {
   fillProjectedFromAverage,
   applyMainToAll,
 } from '../state/incomeBulk.js'
-import { defaultRecordMonth } from '../components/RecordIncomeForm.jsx'
+import { defaultRecordMonth } from '../state/currentMonth.js'
 
 let _nextId = Date.now()
 function newId() {
@@ -310,7 +310,9 @@ export default function Income() {
           <section className="income-section">
             <h3 className="income-section-title">All months</h3>
             <div className="grid-auto-wide months-grid" aria-label="month cards">
-              {months.map((m) => {
+              {/* Exclude the current month — it is shown in the featured card above
+                  (avoids a duplicate card and duplicate aria-labels). */}
+              {months.filter((m) => m.month !== thisMonth).map((m) => {
                 const pcbEntry = (year?.pcbPaid ?? []).find((p) => p.month === m.month)
                 return (
                   <MonthCard
