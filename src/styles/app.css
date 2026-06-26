@@ -1,4 +1,4 @@
-.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+.container { width: 100%; max-width: 1560px; margin: 0 auto; padding: 24px clamp(16px,4vw,48px); }
 h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
 .subtitle { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
 .card { background: var(--surface); border: 2.5px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; }
@@ -21,9 +21,15 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 /* Legacy collapse for medium screens */
 @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
+/* ── Responsive grid utilities (Task A1) ─────────────────────────────────── */
+.grid-auto { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid-auto-wide { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.split-2 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 1024px) { .split-2 { grid-template-columns: 2fr 1fr; } }
+
 .app { display: flex; min-height: 100vh; }
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.topbar { display: flex; justify-content: flex-end; padding: 14px 24px 0; }
+.topbar { display: flex; justify-content: flex-end; padding: 14px clamp(16px,4vw,48px) 0; }
 .nav { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 18px 14px; display: flex; flex-direction: column; gap: 18px; position: sticky; top: 0; height: 100vh; }
 .nav-brand { font-size: 22px; font-weight: 800; color: var(--gold); }
 .nav-brand span { color: var(--ink); }
@@ -88,9 +94,19 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .btn-secondary { background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--gold); font-weight: 600; }
 @media (max-width: 640px) { .part-row { grid-template-columns: 1fr 1fr; } }
 
-.relief { margin-bottom: 14px; }
+.relief { }
 .relief-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .relief-hint { margin-top: 10px; font-size: 13px; color: var(--pink); }
+
+/* ── BE Guide layout (Task A5) ───────────────────────────────────────────── */
+.guide-prose { max-width: 72ch; }
+.guide-split { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 1024px) { .guide-split { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+/* ── Tax Calc side-by-side (Task A4) ─────────────────────────────────────── */
+.taxcalc-split { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 1024px) { .taxcalc-split { grid-template-columns: 1.3fr 1fr; align-items: start; } }
+.taxcalc-scenarios { display: flex; flex-direction: column; gap: 0; }
 
 .tax-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; min-width: 320px; }
 .tax-table th, .tax-table td { text-align: right; padding: 8px; border-bottom: 1px solid var(--border); }
@@ -150,6 +166,14 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
   .year-add-label { display: none; }
 }
 
+/* ── Tabs component (Task B1) ────────────────────────────────────────────── */
+.tabs-bar { display: flex; gap: 4px; margin-bottom: 20px; padding: 4px; background: var(--paper); border: 2px solid var(--border); border-radius: 14px; }
+.tabs-btn { flex: 1; background: transparent; border: 2px solid transparent; border-radius: 10px; padding: 9px 16px; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; transition: background .15s, color .15s, border-color .15s; white-space: nowrap; }
+.tabs-btn:hover { background: var(--surface); color: var(--ink); }
+.tabs-btn-active { background: var(--surface); color: var(--ink); border-color: var(--border); box-shadow: 2px 2px 0 var(--border); }
+.tab-panel { outline: none; }
+@media (max-width: 480px) { .tabs-btn { padding: 8px 8px; font-size: 12px; } }
+
 /* ── Income page (Task 3.1) ─────────────────────────────────────────────── */
 .income-section { margin-bottom: 28px; }
 .income-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -176,21 +200,6 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .source-months-field { flex: 1 1 80px; min-width: 70px; }
 .field-label { font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
 .field select { background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--ink); font-size: 14px; cursor: pointer; }
-
-/* Override log table */
-.override-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.override-table th { text-align: left; padding: 10px 12px; background: var(--paper); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 2px solid var(--border); }
-.override-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.override-row:last-child td { border-bottom: none; }
-.override-projected { color: var(--muted); }
-.override-input { background: var(--paper); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; color: var(--ink); font-size: 13px; width: 100px; }
-.override-input:focus { outline: 2px solid var(--gold); }
-.override-clear-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--muted); padding: 3px 7px; font-size: 11px; }
-.override-clear-btn:hover { color: var(--pink); border-color: var(--pink); }
-@media (max-width: 640px) {
-  .override-table th:nth-child(2), .override-table td:nth-child(2) { display: none; }
-  .override-input { width: 80px; }
-}
 
 /* ── Lock screen (Task 2.2) ─────────────────────────────────────────────── */
 .lock-backdrop {
@@ -587,7 +596,6 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 
 /* ── Settings page (Task 2.6) ───────────────────────────────────────────── */
 .settings-section {
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -921,13 +929,94 @@ h2.page-title { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spaci
 .record-item-row { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 8px; align-items: center; }
 .record-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 
-/* ── Month override table: status + current month ───────────────────────── */
-.override-status { font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 20px; border: 2px solid var(--border); white-space: nowrap; }
-.override-status.is-actual { background: var(--gold); color: #1a1408; }
-.override-status.is-projected { background: transparent; color: var(--muted); }
-.override-row.is-current { background: color-mix(in srgb, var(--gold) 14%, transparent); }
-.current-tag { display: inline-block; margin-left: 8px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--gold); border: 1.5px solid var(--gold); border-radius: 10px; padding: 1px 6px; }
 
 /* ── Dashboard actual/projected indicator ───────────────────────────────── */
 .actual-indicator { margin-top: 10px; font-size: 12px; color: var(--muted); }
 .actual-indicator strong { color: var(--gold); }
+
+/* ── MonthCard component (Task B3) ──────────────────────────────────────── */
+.month-card { display: flex; flex-direction: column; gap: 12px; position: relative; }
+.month-card-actual { border-color: var(--gold); box-shadow: 3px 3px 0 var(--gold); }
+.month-card-current { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.month-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.month-card-meta { display: flex; flex-direction: column; gap: 3px; }
+.month-card-label { font-size: 15px; font-weight: 800; color: var(--ink); }
+.month-card-this-month { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--gold); border: 1.5px solid var(--gold); border-radius: 10px; padding: 1px 6px; display: inline-block; }
+
+.month-card-badge { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; padding: 3px 9px; border-radius: 20px; border: 2px solid var(--border); white-space: nowrap; flex-shrink: 0; }
+.month-card-badge-actual { background: var(--gold); color: #1a1408; border-color: var(--gold); }
+.month-card-badge-projected { background: transparent; color: var(--muted); }
+
+.month-card-fields { display: flex; flex-direction: column; gap: 10px; }
+.month-card-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.month-card-field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.month-card-input { background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 10px; color: var(--ink); font-size: 14px; font-weight: 600; width: 100%; box-sizing: border-box; outline: none; transition: border-color .15s; }
+.month-card-input:focus { border-color: var(--gold); }
+.month-card-actual .month-card-input:focus { border-color: var(--gold); }
+
+.month-card-part-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.month-card-part-toggle { display: inline-flex; gap: 4px; }
+.month-card-items { display: flex; flex-direction: column; gap: 4px; }
+.month-card-item-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.month-card-item-row:last-child { border-bottom: none; }
+.month-card-item-date { color: var(--muted); }
+.month-card-item-amount { font-weight: 700; color: var(--ink); }
+.month-card-item-note { color: var(--muted); font-size: 11px; }
+.month-card-empty-items { font-size: 12px; color: var(--muted); font-style: italic; }
+
+.month-card-total { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1.5px solid var(--border); margin-top: 2px; }
+.month-card-total-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.month-card-total-value { font-size: 18px; font-weight: 800; color: var(--ink); }
+.month-card-actual .month-card-total-value { color: var(--gold); }
+
+.month-card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.month-card-record-btn { font-size: 12px; padding: 7px 12px; }
+.month-card-clear-btn { font-size: 12px; padding: 7px 12px; }
+
+/* ── MonthsSummary (Task B4) ─────────────────────────────────────────────── */
+.months-summary { background: var(--surface); border: 2.5px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 20px; }
+.months-summary-sticky { position: sticky; top: 0; z-index: 10; background: var(--paper); padding: 8px 0; margin-bottom: 4px; }
+.months-summary-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.months-summary-stat { display: flex; flex-direction: column; gap: 2px; flex: 1 1 140px; }
+.months-summary-gross { font-size: 22px !important; }
+.months-summary-actuals { font-size: 22px; font-weight: 800; color: var(--ink); }
+.months-summary-actuals-n { color: var(--gold); }
+.months-summary-actuals-sep { color: var(--muted); margin: 0 2px; }
+.months-summary-actuals-denom { color: var(--muted); }
+.months-summary-tax { font-size: 22px; font-weight: 800; color: var(--pink); }
+.months-summary-chart { width: 100%; }
+
+/* MonthsSummary chart tooltip */
+.months-chart-tooltip { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 2px 2px 0 var(--border); }
+.months-chart-tooltip-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.months-chart-tooltip-row { display: flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 600; }
+.months-chart-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.months-chart-dot-main { background: var(--gold); }
+.months-chart-dot-part { background: var(--pink); }
+
+/* Featured current-month MonthCard */
+.months-featured-section { margin-bottom: 28px; }
+.months-featured-card { max-width: 480px; }
+.months-featured-card .card { border-width: 3px; box-shadow: 4px 4px 0 var(--gold); }
+.months-featured-card .month-card-input { font-size: 15px; }
+.months-featured-card .month-card-total-value { font-size: 22px; }
+
+/* All-months grid */
+.months-grid { margin-top: 12px; }
+
+/* ── Bulk actions panel (Task B4) ────────────────────────────────────────── */
+.bulk-actions-section { margin-top: 32px; }
+.bulk-actions-card { display: flex; flex-direction: column; gap: 12px; }
+.bulk-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.bulk-action-btn { font-size: 12px; padding: 7px 12px; white-space: nowrap; }
+.bulk-action-btn-active { border-color: var(--gold); color: var(--gold); }
+.bulk-action-inputs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.bulk-action-field { min-width: 200px; }
+.bulk-action-field input, .bulk-action-field select { background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 10px; color: var(--ink); font-size: 14px; font-weight: 600; min-width: 160px; }
+.bulk-action-confirm-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bulk-action-confirm-msg { font-size: 13px; font-weight: 600; color: var(--ink); margin: 0; flex: 1 1 200px; }
+@media (max-width: 480px) {
+  .bulk-actions-row { flex-direction: column; }
+  .months-summary-stats { gap: 10px; }
+}
