@@ -69,6 +69,17 @@ const BULK_ACTIONS = [
 export default function Income() {
   const ctx = useProfile()
 
+  // Hooks must run on every render — declare them BEFORE any early return so the
+  // hook count stays constant regardless of vault state (Rules of Hooks).
+  const [tab, setTab] = useState('months')
+  const [csvModalOpen, setCsvModalOpen] = useState(false)
+
+  // Bulk-action state
+  const [bulkAction, setBulkAction] = useState('')
+  const [bulkAmount, setBulkAmount] = useState('')
+  const [bulkFromMonth, setBulkFromMonth] = useState('')
+  const [bulkConfirmMsg, setBulkConfirmMsg] = useState('')
+
   if (!ctx) {
     return (
       <div>
@@ -79,15 +90,6 @@ export default function Income() {
   }
 
   const { year, setYear } = ctx
-  const [tab, setTab] = useState('months')
-  const [csvModalOpen, setCsvModalOpen] = useState(false)
-
-  // Bulk-action state
-  const [bulkAction, setBulkAction] = useState('')
-  const [bulkAmount, setBulkAmount] = useState('')
-  const [bulkFromMonth, setBulkFromMonth] = useState('')
-  const [bulkConfirmMsg, setBulkConfirmMsg] = useState('')
-
   const sources = year?.incomeSources ?? []
   const overrides = year?.monthOverrides ?? {}
   const taxYear = year?.taxYear ?? 2026
